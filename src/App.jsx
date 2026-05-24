@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { patients, medications, labs, documents, recentSearches } from "./data/mockData";
 import Navbar from "./components/Navbar";
 import PatientSidebar from "./components/PatientSidebar";
@@ -16,32 +16,68 @@ export default function App() {
   const [compactMode, setCompactMode] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [globalSearchQuery, setGlobalSearchQuery] = useState("");
+  const searchRef = useRef(null);
+
 
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.id === selectedPatientId) ?? patients[0],
     [selectedPatientId]
   );
 
+  const handleSelectPatient = (id) => {
+  setSelectedPatientId(id);
+  setModal(null);
+  setGlobalSearchOpen(false);
+  setGlobalSearchQuery("");
+};
+  useEffect(() => {
+  function handleOutsideClick(event) {
+    if (
+      searchRef.current &&
+      !searchRef.current.contains(event.target)
+    ) {
+      setGlobalSearchOpen(false);
+    }
+  }
+
+  document.addEventListener("mousedown", handleOutsideClick);
+
+  return () => {
+    document.removeEventListener("mousedown", handleOutsideClick);
+  };
+}, []);
   const openModal = (type) => setModal(type);
   const closeModal = () => setModal(null);
-
+  
   return (
     <div className="app-shell">
-      <Navbar
-  searchValue={globalSearchQuery}
-  onSearchChange={(value) => {
-    setGlobalSearchQuery(value);
-    setGlobalSearchOpen(true);
-  }}
-  onSearchFocus={() => setGlobalSearchOpen(true)}
-  onToggleSidebar={() => setSidebarCollapsed((value) => !value)}
-/>
+      <div ref={searchRef}>
+  <Navbar
+    searchValue={globalSearchQuery}
+    onSearchChange={(value) => {
+      setGlobalSearchQuery(value);
+      setGlobalSearchOpen(true);
+    }}
+    onSearchFocus={() => setGlobalSearchOpen(true)}
+    onToggleSidebar={() => setSidebarCollapsed((value) => !value)}
+  />
+
+  {globalSearchOpen && (
+    <SearchOverlay
+      patients={patients}
+      recentSearches={recentSearches}
+      query={globalSearchQuery}
+      onClose={() => setGlobalSearchOpen(false)}
+      onSelectPatient={handleSelectPatient}
+    />
+  )}
+</div>
 
       <div className={`workspace ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
         <PatientSidebar
   patients={patients}
   selectedPatientId={selectedPatientId}
-  onSelectPatient={setSelectedPatientId}
+  onSelectPatient={handleSelectPatient}
   onAddPatient={() => openModal("patient")}
   collapsed={sidebarCollapsed}
 />
@@ -84,6 +120,7 @@ export default function App() {
   onAdd={() => openModal("medications")}
   onSeeAll={() => openModal("medications")}
   defaultExpanded={false}
+  resetKey={selectedPatientId}
 />
 
 <WidgetCard
@@ -92,7 +129,8 @@ export default function App() {
   kind="labs"
   onAdd={() => openModal("labs")}
   onSeeAll={() => openModal("labs")}
-  defaultExpanded={true}
+  defaultExpanded={false}
+  resetKey={selectedPatientId}
 />
           </section>
 
@@ -104,24 +142,22 @@ export default function App() {
   onSeeAll={() => openModal("documents")}
   variant="toggled"
   fullWidth
+  defaultExpanded={false}
+  resetKey={selectedPatientId}
 />
         </main>
       </div>
 
-     {globalSearchOpen && (
+     {/* {globalSearchOpen && (
   <SearchOverlay
     patients={patients}
     recentSearches={recentSearches}
     query={globalSearchQuery}
     setQuery={setGlobalSearchQuery}
     onClose={() => setGlobalSearchOpen(false)}
-    onSelectPatient={(id) => {
-      setSelectedPatientId(id);
-      setGlobalSearchOpen(false);
-      setGlobalSearchQuery("");
-    }}
+    onSelectPatient={handleSelectPatient}
 />
-      )}
+      )} */}
 
       {modal && (
         <OverlayModal

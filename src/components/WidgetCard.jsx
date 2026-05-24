@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function WidgetCard({
   title,
@@ -7,9 +7,15 @@ export default function WidgetCard({
   onAdd,
   onSeeAll,
   variant = "brief",
-  fullWidth = false
+  fullWidth = false,
+  defaultExpanded = false,
+  resetKey
 }) {
-  const [expanded, setExpanded] = useState(variant !== "toggled");
+  const [expanded, setExpanded] = useState(defaultExpanded);
+
+  useEffect(() => {
+    setExpanded(defaultExpanded);
+  }, [resetKey, defaultExpanded]);
 
   const visibleItems = variant === "brief" ? items.slice(0, 2) : items;
 
