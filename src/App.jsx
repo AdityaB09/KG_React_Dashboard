@@ -77,13 +77,13 @@ export default function App() {
           </section>
 
           <section className={`widgets-grid ${compactMode ? "compact" : ""}`}>
-            <WidgetCard
+       <WidgetCard
   title="Medication Log"
   items={medications}
   kind="medications"
   onAdd={() => openModal("medications")}
   onSeeAll={() => openModal("medications")}
-  variant="brief"
+  defaultExpanded={false}
 />
 
 <WidgetCard
@@ -92,7 +92,7 @@ export default function App() {
   kind="labs"
   onAdd={() => openModal("labs")}
   onSeeAll={() => openModal("labs")}
-  variant="brief"
+  defaultExpanded={true}
 />
           </section>
 
@@ -108,17 +108,18 @@ export default function App() {
         </main>
       </div>
 
-      {globalSearchOpen && (
-        <SearchOverlay
-  patients={patients}
-  recentSearches={recentSearches}
-  initialQuery={globalSearchQuery}
-  onClose={() => setGlobalSearchOpen(false)}
-  onSelectPatient={(id) => {
-    setSelectedPatientId(id);
-    setGlobalSearchOpen(false);
-    setGlobalSearchQuery("");
-  }}
+     {globalSearchOpen && (
+  <SearchOverlay
+    patients={patients}
+    recentSearches={recentSearches}
+    query={globalSearchQuery}
+    setQuery={setGlobalSearchQuery}
+    onClose={() => setGlobalSearchOpen(false)}
+    onSelectPatient={(id) => {
+      setSelectedPatientId(id);
+      setGlobalSearchOpen(false);
+      setGlobalSearchQuery("");
+    }}
 />
       )}
 

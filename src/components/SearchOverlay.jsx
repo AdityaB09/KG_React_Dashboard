@@ -1,14 +1,13 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 export default function SearchOverlay({
   patients,
   recentSearches,
-  initialQuery = "",
+  query,
+  setQuery,
   onClose,
   onSelectPatient
 }) {
-  const [query, setQuery] = useState(initialQuery);
-
   const matchedPatients = useMemo(() => {
     if (!query.trim()) return patients.slice(0, 4);
 
@@ -20,47 +19,41 @@ export default function SearchOverlay({
   }, [patients, query]);
 
   return (
-    <div className="search-backdrop" onMouseDown={onClose}>
-      <section className="search-panel" onMouseDown={(event) => event.stopPropagation()}>
-        <div className="search-input-large">
-          <span>⌕</span>
-          <input
-            autoFocus
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search patients"
-          />
-          <button onClick={onClose}>×</button>
-        </div>
+    <div className="search-dropdown">
+      <div className="search-dropdown-input">
+        <span>⌕</span>
+        <input
+          autoFocus
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="What are you looking for?"
+        />
+        <button onClick={onClose}>×</button>
+      </div>
 
-        <div className="search-section">
-          <h3>People</h3>
+      <div className="search-dropdown-list">
+        <h3>People</h3>
 
-          {matchedPatients.map((patient) => (
-            <button
-              key={patient.id}
-              className="search-result"
-              onClick={() => onSelectPatient(patient.id)}
-            >
-              <span className="avatar">{patient.avatar}</span>
-              <span>
-                <strong>{patient.name}</strong>
-                <small>MRN: {patient.mrn} • {patient.unit}</small>
-              </span>
-              <span>›</span>
-            </button>
-          ))}
-
-          {matchedPatients.length === 0 && (
-            <p className="empty-state">No patient found.</p>
-          )}
-        </div>
+        {matchedPatients.map((patient) => (
+          <button
+            key={patient.id}
+            className="dropdown-result"
+            onClick={() => onSelectPatient(patient.id)}
+          >
+            <span className="avatar">{patient.avatar}</span>
+            <span>
+              <strong>{patient.name}</strong>
+              <small>MRN: {patient.mrn} • {patient.unit}</small>
+            </span>
+            <span>›</span>
+          </button>
+        ))}
 
         {!query && (
-          <div className="search-section">
+          <>
             <h3>Recent searches</h3>
-            {recentSearches.map((item, index) => (
-              <div className="search-result passive" key={`${item.title}-${index}`}>
+            {recentSearches.slice(0, 5).map((item, index) => (
+              <div className="dropdown-result passive" key={`${item.title}-${index}`}>
                 <span className="row-icon">{item.type[0]}</span>
                 <span>
                   <strong>{item.title}</strong>
@@ -68,9 +61,9 @@ export default function SearchOverlay({
                 </span>
               </div>
             ))}
-          </div>
+          </>
         )}
-      </section>
+      </div>
     </div>
   );
 }
