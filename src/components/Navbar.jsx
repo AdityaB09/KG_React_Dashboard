@@ -1,13 +1,26 @@
-export default function Navbar({ onSearchFocus }) {
+export default function Navbar({
+  searchValue,
+  onSearchChange,
+  onSearchFocus,
+  onToggleSidebar
+}) {
   return (
     <header className="navbar">
       <div className="nav-left">
-        <button className="icon-btn" aria-label="Open menu">☰</button>
-        <button className="global-search" onClick={onSearchFocus}>
-          <span>⌕</span>
-          <span>Search patients, appointments etc</span>
-          <kbd>⌘K</kbd>
+        <button className="icon-btn" onClick={onToggleSidebar} aria-label="Toggle patient directory">
+          ☰
         </button>
+
+        <label className="global-search">
+          <span>⌕</span>
+          <input
+            value={searchValue}
+            onFocus={onSearchFocus}
+            onChange={(event) => onSearchChange(event.target.value)}
+            placeholder="Search patients, appointments etc"
+          />
+          <kbd>⌘K</kbd>
+        </label>
       </div>
 
       <nav className="nav-links" aria-label="Main navigation">

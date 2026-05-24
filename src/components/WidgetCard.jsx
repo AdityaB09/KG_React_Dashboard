@@ -6,41 +6,37 @@ export default function WidgetCard({
   kind,
   onAdd,
   onSeeAll,
-  defaultExpanded = true,
+  variant = "brief",
   fullWidth = false
 }) {
-  const [expanded, setExpanded] = useState(defaultExpanded);
+  const [expanded, setExpanded] = useState(variant !== "toggled");
 
-  const briefItems = items.slice(0, fullWidth ? 2 : 3);
-  const visibleItems = expanded ? items : briefItems;
+  const visibleItems = variant === "brief" ? items.slice(0, 2) : items;
 
   return (
-    <section className={`widget-card ${fullWidth ? "full-width" : ""} ${expanded ? "expanded" : "collapsed"}`}>
+    <section className={`widget-card ${fullWidth ? "full-width" : ""}`}>
       <header className="widget-header">
         <button className="widget-title-btn" onClick={() => setExpanded((value) => !value)}>
           <strong>{title}</strong>
           <span>{expanded ? "⌃" : "⌄"}</span>
         </button>
+
         <button className="add-btn" onClick={onAdd}>+ Add</button>
       </header>
 
       {expanded && (
-        <div className="widget-body">
-          {visibleItems.map((item) => (
-            <WidgetRow key={item.id} item={item} kind={kind} />
-          ))}
-        </div>
-      )}
+        <>
+          <div className="widget-body">
+            {visibleItems.map((item) => (
+              <WidgetRow key={item.id} item={item} kind={kind} />
+            ))}
+          </div>
 
-      {!expanded && (
-        <button className="collapsed-message" onClick={() => setExpanded(true)}>
-          Expand {title.toLowerCase()} to view {items.length} items
-        </button>
+          <button className="see-all" onClick={onSeeAll}>
+            See all {kind === "labs" ? "reports" : kind}
+          </button>
+        </>
       )}
-
-      <button className="see-all" onClick={onSeeAll}>
-        See all {kind === "labs" ? "reports" : kind}
-      </button>
     </section>
   );
 }
@@ -49,12 +45,11 @@ function WidgetRow({ item, kind }) {
   if (kind === "medications") {
     return (
       <article className="widget-row">
-        <div className="row-icon">✚</div>
+        <div className="row-icon">💊</div>
         <div>
           <strong>{item.medication}</strong>
           <p>{item.dose}, {item.frequency}</p>
         </div>
-        <span className={`small-pill ${item.status.toLowerCase()}`}>{item.status}</span>
         <span className="chevron">›</span>
       </article>
     );
@@ -63,12 +58,11 @@ function WidgetRow({ item, kind }) {
   if (kind === "labs") {
     return (
       <article className="widget-row">
-        <div className="row-icon">□</div>
+        <div className="row-icon">⌷</div>
         <div>
           <strong>{item.title}</strong>
           <p>{item.description}</p>
         </div>
-        <span className="row-value">{item.value}</span>
         <span className="chevron">›</span>
       </article>
     );
@@ -81,7 +75,6 @@ function WidgetRow({ item, kind }) {
         <strong>{item.title}</strong>
         <p>{item.type} • {item.owner}</p>
       </div>
-      <span className="row-value">{item.date}</span>
       <span className="chevron">›</span>
     </article>
   );

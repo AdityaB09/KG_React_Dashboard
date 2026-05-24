@@ -1,6 +1,12 @@
 import { useMemo, useState } from "react";
 
-export default function PatientSidebar({ patients, selectedPatientId, onSelectPatient, onAddPatient }) {
+export default function PatientSidebar({
+  patients,
+  selectedPatientId,
+  onSelectPatient,
+  onAddPatient,
+  collapsed
+})  {
   const [query, setQuery] = useState("");
 
   const groupedPatients = useMemo(() => {
@@ -16,7 +22,7 @@ export default function PatientSidebar({ patients, selectedPatientId, onSelectPa
   }, [patients, query]);
 
   return (
-    <aside className="patient-sidebar">
+    <aside className={`patient-sidebar ${collapsed ? "collapsed" : ""}`}>
       <div className="sidebar-header">
         <h2>Patient directory</h2>
         <p>Search among {patients.length} patients</p>

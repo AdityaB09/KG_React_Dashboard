@@ -14,6 +14,8 @@ export default function App() {
   const [modal, setModal] = useState(null);
   const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
   const [compactMode, setCompactMode] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [globalSearchQuery, setGlobalSearchQuery] = useState("");
 
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.id === selectedPatientId) ?? patients[0],
@@ -25,15 +27,24 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <Navbar onSearchFocus={() => setGlobalSearchOpen(true)} />
+      <Navbar
+  searchValue={globalSearchQuery}
+  onSearchChange={(value) => {
+    setGlobalSearchQuery(value);
+    setGlobalSearchOpen(true);
+  }}
+  onSearchFocus={() => setGlobalSearchOpen(true)}
+  onToggleSidebar={() => setSidebarCollapsed((value) => !value)}
+/>
 
-      <div className="workspace">
+      <div className={`workspace ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
         <PatientSidebar
-          patients={patients}
-          selectedPatientId={selectedPatientId}
-          onSelectPatient={setSelectedPatientId}
-          onAddPatient={() => openModal("patient")}
-        />
+  patients={patients}
+  selectedPatientId={selectedPatientId}
+  onSelectPatient={setSelectedPatientId}
+  onAddPatient={() => openModal("patient")}
+  collapsed={sidebarCollapsed}
+/>
 
         <main className="dashboard-main" aria-label="Patient dashboard">
           <div className="main-toolbar">
@@ -67,46 +78,48 @@ export default function App() {
 
           <section className={`widgets-grid ${compactMode ? "compact" : ""}`}>
             <WidgetCard
-              title="Medication Log"
-              items={medications}
-              kind="medications"
-              onAdd={() => openModal("medications")}
-              onSeeAll={() => openModal("medications")}
-              defaultExpanded={!compactMode}
-            />
+  title="Medication Log"
+  items={medications}
+  kind="medications"
+  onAdd={() => openModal("medications")}
+  onSeeAll={() => openModal("medications")}
+  variant="brief"
+/>
 
-            <WidgetCard
-              title="Lab Results"
-              items={labs}
-              kind="labs"
-              onAdd={() => openModal("labs")}
-              onSeeAll={() => openModal("labs")}
-              defaultExpanded={!compactMode}
-            />
+<WidgetCard
+  title="Lab Results"
+  items={labs}
+  kind="labs"
+  onAdd={() => openModal("labs")}
+  onSeeAll={() => openModal("labs")}
+  variant="brief"
+/>
           </section>
 
           <WidgetCard
-            title="Documents"
-            items={documents}
-            kind="documents"
-            onAdd={() => openModal("documents")}
-            onSeeAll={() => openModal("documents")}
-            defaultExpanded={false}
-            fullWidth
-          />
+  title="Documents"
+  items={documents}
+  kind="documents"
+  onAdd={() => openModal("documents")}
+  onSeeAll={() => openModal("documents")}
+  variant="toggled"
+  fullWidth
+/>
         </main>
       </div>
 
       {globalSearchOpen && (
         <SearchOverlay
-          patients={patients}
-          recentSearches={recentSearches}
-          onClose={() => setGlobalSearchOpen(false)}
-          onSelectPatient={(id) => {
-            setSelectedPatientId(id);
-            setGlobalSearchOpen(false);
-          }}
-        />
+  patients={patients}
+  recentSearches={recentSearches}
+  initialQuery={globalSearchQuery}
+  onClose={() => setGlobalSearchOpen(false)}
+  onSelectPatient={(id) => {
+    setSelectedPatientId(id);
+    setGlobalSearchOpen(false);
+    setGlobalSearchQuery("");
+  }}
+/>
       )}
 
       {modal && (

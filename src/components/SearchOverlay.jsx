@@ -1,12 +1,21 @@
 import { useMemo, useState } from "react";
 
-export default function SearchOverlay({ patients, recentSearches, onClose, onSelectPatient }) {
-  const [query, setQuery] = useState("");
+export default function SearchOverlay({
+  patients,
+  recentSearches,
+  initialQuery = "",
+  onClose,
+  onSelectPatient
+}) {
+  const [query, setQuery] = useState(initialQuery);
 
   const matchedPatients = useMemo(() => {
     if (!query.trim()) return patients.slice(0, 4);
+
     return patients.filter((patient) =>
-      `${patient.name} ${patient.mrn} ${patient.unit}`.toLowerCase().includes(query.toLowerCase())
+      `${patient.name} ${patient.mrn} ${patient.unit} ${patient.location}`
+        .toLowerCase()
+        .includes(query.toLowerCase())
     );
   }, [patients, query]);
 
@@ -19,15 +28,20 @@ export default function SearchOverlay({ patients, recentSearches, onClose, onSel
             autoFocus
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search patients only"
+            placeholder="Search patients"
           />
           <button onClick={onClose}>×</button>
         </div>
 
         <div className="search-section">
           <h3>People</h3>
+
           {matchedPatients.map((patient) => (
-            <button key={patient.id} className="search-result" onClick={() => onSelectPatient(patient.id)}>
+            <button
+              key={patient.id}
+              className="search-result"
+              onClick={() => onSelectPatient(patient.id)}
+            >
               <span className="avatar">{patient.avatar}</span>
               <span>
                 <strong>{patient.name}</strong>
@@ -36,6 +50,10 @@ export default function SearchOverlay({ patients, recentSearches, onClose, onSel
               <span>›</span>
             </button>
           ))}
+
+          {matchedPatients.length === 0 && (
+            <p className="empty-state">No patient found.</p>
+          )}
         </div>
 
         {!query && (

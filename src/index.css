@@ -700,3 +700,131 @@ kbd {
     width: 210px;
   }
 }
+
+
+.workspace {
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  transition: grid-template-columns 0.25s ease;
+}
+
+.workspace.sidebar-collapsed {
+  grid-template-columns: 0 minmax(0, 1fr);
+}
+
+.patient-sidebar {
+  overflow: hidden;
+}
+
+.patient-sidebar.collapsed {
+  width: 0;
+  border-right: 0;
+}
+
+.global-search {
+  min-width: 360px;
+  padding: 0 11px;
+}
+
+.global-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  padding: 9px 0;
+  color: var(--text);
+}
+
+.dashboard-main {
+  height: calc(100vh - 64px);
+  overflow: hidden;
+  padding: 14px 20px;
+  display: grid;
+  grid-template-rows: auto auto auto auto;
+  gap: 12px;
+}
+
+.main-toolbar h1 {
+  margin: 3px 0 0;
+  font-size: 24px;
+}
+
+.patient-summary {
+  padding: 14px 18px;
+  min-height: 112px;
+}
+
+.ecg-panel {
+  padding: 14px 16px;
+  min-height: 180px;
+}
+
+.ecg-wave {
+  width: 100%;
+  height: 58px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 170px;
+  gap: 14px;
+  min-height: 0;
+}
+
+.quick-actions-panel {
+  min-height: 100%;
+}
+
+.widgets-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  min-height: 0;
+}
+
+.widget-card {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.widget-card.full-width {
+  min-height: 56px;
+  flex: 0 0 auto;
+}
+
+.widget-header {
+  padding: 10px 14px;
+  min-height: 48px;
+}
+
+.widget-body {
+  overflow-y: auto;
+  max-height: 170px;
+}
+
+.widget-card.full-width .widget-body {
+  max-height: 110px;
+}
+
+.widget-row {
+  padding: 11px 14px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.see-all {
+  margin-top: auto;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: #fff;
+  padding: 9px;
+  color: var(--muted);
+  font-weight: 800;
+}
