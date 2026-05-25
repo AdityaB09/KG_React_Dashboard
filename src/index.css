@@ -769,3 +769,143 @@ kbd {
     width: auto;
   }
 }
+
+
+body.dark-mode {
+  --bg: #0f172a;
+  --panel: #162033;
+  --panel-soft: #1e293b;
+  --line: #334155;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --brand: #60a5fa;
+  --brand-soft: rgba(96, 165, 250, 0.16);
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-mode .navbar,
+body.dark-mode .patient-sidebar,
+body.dark-mode .patient-row,
+body.dark-mode .quick-option,
+body.dark-mode .see-all,
+body.dark-mode .ghost-btn,
+body.dark-mode .search-dropdown,
+body.dark-mode .dropdown-result,
+body.dark-mode .overlay-modal {
+  background: var(--panel);
+  color: var(--text);
+}
+
+body.dark-mode .global-search,
+body.dark-mode .sidebar-search,
+body.dark-mode .search-input-large,
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+  background: #0f172a;
+  color: var(--text);
+  border-color: var(--line);
+}
+
+body.dark-mode .patient-row:hover,
+body.dark-mode .patient-row.selected,
+body.dark-mode .dropdown-result:hover,
+body.dark-mode .quick-option:hover,
+body.dark-mode .quick-option.active {
+  background: #1e293b;
+}
+
+.telemetry-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.telemetry-grid div {
+  border: 1px solid var(--line);
+  background: var(--panel-soft);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.telemetry-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.telemetry-grid strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 15px;
+}
+
+.ecg-stream-box {
+  margin-top: 14px;
+  height: 150px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 24px 24px;
+  overflow: hidden;
+}
+
+.ecg-wave {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.ecg-wave polyline {
+  fill: none;
+  stroke: var(--success);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px rgba(52, 211, 153, 0.45));
+}
+
+.ecg-panel.danger {
+  border-color: rgba(248, 113, 113, 0.65);
+}
+
+.ecg-panel.danger .ecg-wave polyline {
+  stroke: var(--danger);
+  filter: drop-shadow(0 0 8px rgba(248, 113, 113, 0.55));
+}
+
+.live-dot.danger {
+  background: #ffe8e8;
+  color: var(--danger);
+}
+
+.widgets-grid.compact {
+  gap: 8px;
+}
+
+.widgets-grid.compact .widget-header {
+  min-height: 44px;
+  padding: 9px 12px;
+}
+
+.widgets-grid.compact .widget-row {
+  padding: 9px 12px;
+}
+
+.widgets-grid.compact .widget-body {
+  max-height: 125px;
+}
+
+@media (max-width: 780px) {
+  .telemetry-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

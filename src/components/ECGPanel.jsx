@@ -1,30 +1,58 @@
-function ECGWave({ offset = 0 }) {
-  const points = [
-    "0,46", "28,46", "34,42", "40,46", "48,46", "52,16", "57,76", "65,46",
-    "92,46", "102,35", "118,46", "145,46", "152,42", "158,46", "166,46",
-    "170,18", "176,77", "185,46", "215,46", "226,36", "242,46", "280,46"
-  ].join(" ");
+export default function ECGPanel({ telemetry }) {
+  const width = 640;
+  const height = 150;
+
+  const points = telemetry.ecg
+    .map((point, index) => {
+      const x = (index / (telemetry.ecg.length - 1)) * width;
+      const y = point.y * height;
+      return `${x},${y}`;
+    })
+    .join(" ");
+
+  const isDanger = telemetry.oxygen < 92 || telemetry.heartRate > 120;
 
   return (
-    <svg viewBox="0 0 280 92" className="ecg-wave" role="img" aria-label="ECG waveform">
-      <polyline points={points} transform={`translate(${offset} 0)`} />
-      <polyline points={points} transform={`translate(${offset - 280} 0)`} />
-    </svg>
-  );
-}
-
-export default function ECGPanel() {
-  return (
-    <section className="ecg-panel">
+    <section className={`ecg-panel ${isDanger ? "danger" : ""}`}>
       <div className="ecg-header">
         <div>
-          <h2>ECG Overview</h2>
-          <p>Live rhythm preview</p>
+          <h2>Live ECG Stream</h2>
+          <p>{telemetry.alert}</p>
         </div>
-        <span className="live-dot">Live</span>
+
+        <span className={`live-dot ${isDanger ? "danger" : ""}`}>
+          ● Live
+        </span>
       </div>
-      <ECGWave />
-      <ECGWave offset={25} />
+
+      <div className="telemetry-grid">
+        <div>
+          <span>HR</span>
+          <strong>{telemetry.heartRate} bpm</strong>
+        </div>
+        <div>
+          <span>SpO₂</span>
+          <strong>{telemetry.oxygen}%</strong>
+        </div>
+        <div>
+          <span>BP</span>
+          <strong>{telemetry.systolic}/{telemetry.diastolic}</strong>
+        </div>
+        <div>
+          <span>RR</span>
+          <strong>{telemetry.respiratoryRate}/min</strong>
+        </div>
+        <div>
+          <span>Temp</span>
+          <strong>{telemetry.temperature}°F</strong>
+        </div>
+      </div>
+
+      <div className="ecg-stream-box">
+        <svg viewBox={`0 0 ${width} ${height}`} className="ecg-wave">
+          <polyline points={points} />
+        </svg>
+      </div>
     </section>
   );
 }

@@ -8,6 +8,8 @@ import WidgetCard from "./components/WidgetCard";
 import OverlayModal from "./components/OverlayModal";
 import SearchOverlay from "./components/SearchOverlay";
 import "./index.css";
+import { createInitialTelemetry, nextTelemetryFrame } from "./services/telemetryService";
+
 
 export default function App() {
   const [selectedPatientId, setSelectedPatientId] = useState(patients[0].id);
@@ -17,7 +19,33 @@ export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [globalSearchQuery, setGlobalSearchQuery] = useState("");
   const searchRef = useRef(null);
+  const [darkMode, setDarkMode] = useState(false);
 
+  const [telemetryMap, setTelemetryMap] = useState(() =>
+  Object.fromEntries(
+    patients.map((patient) => [
+      patient.id,
+      createInitialTelemetry(patient.id, patient.risk)
+    ])
+  )
+);
+
+
+  useEffect(() => {
+  const interval = setInterval(() => {
+    setTelemetryMap((prev) => {
+      const updated = {};
+
+      for (const patient of patients) {
+        updated[patient.id] = nextTelemetryFrame(prev[patient.id]);
+      }
+
+      return updated;
+    });
+  }, 90);
+
+  return () => clearInterval(interval);
+}, []);
 
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.id === selectedPatientId) ?? patients[0],
@@ -49,6 +77,12 @@ export default function App() {
   const openModal = (type) => setModal(type);
   const closeModal = () => setModal(null);
   
+
+  useEffect(() => {
+  document.body.classList.toggle("dark-mode", darkMode);
+}, [darkMode]);
+
+
   return (
     <div className="app-shell">
       <div ref={searchRef}>
@@ -90,9 +124,13 @@ export default function App() {
             </div>
 
             <div className="toolbar-actions">
+              <button className="ghost-btn" onClick={() => setDarkMode((value) => !value)}>
+  {darkMode ? "Light mode" : "Dark mode"}
+</button>
               <button className="ghost-btn" onClick={() => setCompactMode((value) => !value)}>
                 {compactMode ? "Comfort view" : "Compact view"}
               </button>
+              
               <button className="primary-btn" onClick={() => openModal("note")}>+ Add note</button>
             </div>
           </div>
@@ -100,7 +138,7 @@ export default function App() {
           <section className="dashboard-grid">
             <div className="patient-column">
               <PatientSummary patient={selectedPatient} />
-              <ECGPanel />
+              <ECGPanel telemetry={telemetryMap[selectedPatientId]} />
             </div>
 
             <aside className="quick-actions-panel">
@@ -113,6 +151,7 @@ export default function App() {
           </section>
 
           <section className={`widgets-grid ${compactMode ? "compact" : ""}`}>
+           
        <WidgetCard
   title="Medication Log"
   items={medications}
