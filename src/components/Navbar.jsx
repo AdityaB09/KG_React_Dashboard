@@ -2,7 +2,8 @@ export default function Navbar({
   searchValue,
   onSearchChange,
   onSearchFocus,
-  onToggleSidebar
+  onToggleSidebar,
+  alertCount = 0
 }) {
   return (
     <header className="navbar">
@@ -31,12 +32,18 @@ export default function Navbar({
       </nav>
 
       <div className="nav-profile">
-        <button className="icon-btn" aria-label="Notifications">♡</button>
+        <button className="icon-btn notification-btn" aria-label="Notifications">
+          ♡
+          {alertCount > 0 && <span className="alert-badge">{alertCount}</span>}
+        </button>
+
         <div className="doctor-avatar">DC</div>
+
         <div className="doctor-meta">
           <strong>Dr Cook</strong>
           <span>Staff Admin</span>
         </div>
+
         <span>⌄</span>
       </div>
     </header>
