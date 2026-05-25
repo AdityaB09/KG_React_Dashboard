@@ -59,9 +59,12 @@ export default function ECGPanel({ telemetry }) {
       </div>
 
       <div className="ecg-stream-box">
-        <svg viewBox={`0 0 ${width} ${height}`}
-  className={`ecg-wave ${waveformClass}`}>
-          <polyline points={points} />
+        <svg
+  viewBox={`0 0 ${width} ${height}`}
+  className={`ecg-wave ${waveformClass}`}
+  preserveAspectRatio="none"
+>
+  <polyline points={points} />
         </svg>
       </div>
     </section>
