@@ -1,24 +1,28 @@
 const MAX_POINTS = 180;
 
 function classifyTelemetry(data) {
-  if (data.oxygen <= 90 || data.heartRate >= 125) {
+
+  if (data.heartRate <= 55) {
     return {
-      rhythm: "arrhythmia",
-      alert: "Irregular rhythm detected"
+      rhythm: "bradycardia",
+      alert: "Low heart rate detected"
     };
   }
 
-  if (data.heartRate >= 105) {
+  if (data.heartRate >= 105 && data.heartRate < 125) {
     return {
       rhythm: "tachycardia",
       alert: "Elevated heart rate"
     };
   }
 
-  if (data.heartRate <= 55) {
+  if (
+    data.oxygen <= 90 ||
+    data.heartRate >= 125
+  ) {
     return {
-      rhythm: "bradycardia",
-      alert: "Low heart rate"
+      rhythm: "arrhythmia",
+      alert: "Irregular rhythm detected"
     };
   }
 
@@ -51,9 +55,18 @@ function rhythmValue(t, rhythm) {
     value = value * 0.9;
   }
 
-  if (rhythm === "arrhythmia" && Math.random() > 0.9) {
-    value += Math.random() * 0.35;
+  if (rhythm === "arrhythmia") {
+
+  if (Math.random() > 0.82) {
+    value += (Math.random() - 0.5) * 0.9;
   }
+
+  if (Math.random() > 0.93) {
+    value = Math.random() > 0.5 ? 0.98 : 0.08;
+  }
+
+  value += Math.sin(t * 18) * 0.12;
+}
 
   return Math.max(0.08, Math.min(0.95, value));
 }

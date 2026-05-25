@@ -11,7 +11,17 @@ export default function ECGPanel({ telemetry }) {
     .join(" ");
 
   const isDanger = telemetry.oxygen < 92 || telemetry.heartRate > 120;
+  
+  const waveformClass =
+  telemetry.rhythm === "arrhythmia"
+    ? "arrhythmia"
+    : telemetry.rhythm === "tachycardia"
+    ? "tachycardia"
+    : telemetry.rhythm === "bradycardia"
+    ? "bradycardia"
+    : "normal";
 
+    
   return (
     <section className={`ecg-panel ${isDanger ? "danger" : ""}`}>
       <div className="ecg-header">
@@ -49,7 +59,8 @@ export default function ECGPanel({ telemetry }) {
       </div>
 
       <div className="ecg-stream-box">
-        <svg viewBox={`0 0 ${width} ${height}`} className="ecg-wave">
+        <svg viewBox={`0 0 ${width} ${height}`}
+  className={`ecg-wave ${waveformClass}`}>
           <polyline points={points} />
         </svg>
       </div>
