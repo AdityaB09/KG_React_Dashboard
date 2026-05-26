@@ -10,6 +10,7 @@ import OverlayModal from "./components/OverlayModal";
 import SearchOverlay from "./components/SearchOverlay";
 import AlertPanel from "./components/AlertPanel";
 import TimelineFeed from "./components/TimelineFeed";
+import MultiPatientMonitor from "./components/MultiPatientMonitor";
 
 import "./index.css";
 
@@ -28,6 +29,12 @@ export default function App() {
 
   const searchRef = useRef(null);
   const lastAlertSignatureRef = useRef("");
+  const [multiMonitorOpen, setMultiMonitorOpen] = useState(false);
+  
+  const [activePage, setActivePage] = useState("dashboard");
+  const [monitorPatientIds, setMonitorPatientIds] = useState([]);
+  
+  const [monitorSlots, setMonitorSlots] = useState([null, null, null, null]);
 
   const [telemetryMap, setTelemetryMap] = useState(() =>
     Object.fromEntries(
@@ -136,15 +143,17 @@ export default function App() {
     <div className={`app-shell ${compactMode ? "compact-mode" : "comfort-mode"}`}>
       <div ref={searchRef}>
         <Navbar
-          searchValue={globalSearchQuery}
-          alertCount={activeAlerts.length}
-          onSearchChange={(value) => {
-            setGlobalSearchQuery(value);
-            setGlobalSearchOpen(true);
-          }}
-          onSearchFocus={() => setGlobalSearchOpen(true)}
-          onToggleSidebar={() => setSidebarCollapsed((value) => !value)}
-        />
+  searchValue={globalSearchQuery}
+  alertCount={activeAlerts.length}
+  activePage={activePage}
+  onPageChange={setActivePage}
+  onSearchChange={(value) => {
+    setGlobalSearchQuery(value);
+    setGlobalSearchOpen(true);
+  }}
+  onSearchFocus={() => setGlobalSearchOpen(true)}
+  onToggleSidebar={() => setSidebarCollapsed((value) => !value)}
+/>
 
         {globalSearchOpen && (
           <SearchOverlay
@@ -167,13 +176,14 @@ export default function App() {
         />
 
         <main className="dashboard-main" aria-label="Patient dashboard">
-          <div className="main-toolbar">
+          {/* <div className="main-toolbar">
             <div>
               <p className="eyebrow">Clinical dashboard</p>
               <h1>{selectedPatient.name}</h1>
             </div>
 
             <div className="toolbar-actions">
+              
               <button className="ghost-btn" onClick={() => setDarkMode((value) => !value)}>
                 {darkMode ? "Light mode" : "Dark mode"}
               </button>
@@ -190,15 +200,49 @@ export default function App() {
 
           <AlertPanel alerts={activeAlerts} />
 
+
           <section className="dashboard-grid priority-two-grid">
             <div className="patient-column">
+              
               <PatientSummary patient={selectedPatient} />
               <ECGPanel telemetry={selectedTelemetry} />
             </div>
 
             <TimelineFeed events={timelineEvents} />
-          </section>
+          </section> */}
+            {activePage === "dashboard" ? (
+  <>
+    <div className="main-toolbar">
+      <div>
+        <p className="eyebrow">Clinical dashboard</p>
+        <h1>{selectedPatient.name}</h1>
+      </div>
 
+      <div className="toolbar-actions">
+        <button className="ghost-btn" onClick={() => setDarkMode((value) => !value)}>
+          {darkMode ? "Light mode" : "Dark mode"}
+        </button>
+
+        <button className="ghost-btn" onClick={() => setCompactMode((value) => !value)}>
+          {compactMode ? "Comfort view" : "Compact view"}
+        </button>
+
+        <button className="primary-btn" onClick={() => openModal("note")}>
+          + Add note
+        </button>
+      </div>
+    </div>
+
+    <AlertPanel alerts={activeAlerts} />
+
+    <section className="dashboard-grid priority-two-grid">
+      <div className="patient-column">
+        <PatientSummary patient={selectedPatient} />
+        <ECGPanel telemetry={selectedTelemetry} />
+      </div>
+
+      <TimelineFeed events={timelineEvents} />
+    </section>
           <section className={`widgets-grid ${compactMode ? "compact" : ""}`}>
             <WidgetCard
               title="Medication Log"
@@ -232,6 +276,34 @@ export default function App() {
             defaultExpanded={false}
             resetKey={selectedPatientId}
           />
+           </>
+) : (
+  <MultiPatientMonitor
+  patients={patients}
+  telemetryMap={telemetryMap}
+  monitorSlots={monitorSlots}
+  onDropPatient={(slotIndex, patientId) => {
+    setMonitorSlots((prev) => {
+      const next = [...prev];
+
+      const existingIndex = next.indexOf(patientId);
+      if (existingIndex !== -1) {
+        next[existingIndex] = null;
+      }
+
+      next[slotIndex] = patientId;
+      return next;
+    });
+  }}
+  onRemovePatient={(slotIndex) => {
+    setMonitorSlots((prev) => {
+      const next = [...prev];
+      next[slotIndex] = null;
+      return next;
+    });
+  }}
+/>
+)}
         </main>
       </div>
 

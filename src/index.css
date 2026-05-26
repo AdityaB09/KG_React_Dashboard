@@ -1262,3 +1262,443 @@ body.dark-mode .timeline-panel {
 .ecg-wave polyline {
   vector-effect: non-scaling-stroke;
 }
+
+
+.multi-monitor-panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.multi-monitor-header {
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.multi-monitor-header h2 {
+  margin: 2px 0 0;
+  font-size: 18px;
+}
+
+.multi-monitor-header span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.multi-monitor-grid {
+  padding: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.monitor-card {
+  border: 1px solid var(--line);
+  background: var(--panel-soft);
+  color: var(--text);
+  border-radius: 16px;
+  padding: 12px;
+  text-align: left;
+  display: grid;
+  gap: 10px;
+}
+
+.monitor-card:hover,
+.monitor-card.selected {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+.monitor-card.critical {
+  border-color: rgba(217, 75, 75, 0.7);
+}
+
+.monitor-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.monitor-top strong {
+  display: block;
+  font-size: 14px;
+}
+
+.monitor-top span,
+.monitor-card p {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.monitor-card p {
+  margin: 0;
+}
+
+.monitor-risk {
+  height: fit-content;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: #e8fff5;
+  color: var(--success) !important;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.monitor-risk.watch {
+  background: #fff6df;
+  color: var(--warning) !important;
+}
+
+.monitor-risk.high {
+  background: #ffe8e8;
+  color: var(--danger) !important;
+}
+
+.mini-wave {
+  width: 100%;
+  height: 58px;
+  border-radius: 10px;
+  background:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.mini-wave polyline {
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.mini-wave.normal polyline {
+  stroke: #34d399;
+}
+
+.mini-wave.tachycardia polyline {
+  stroke: #fbbf24;
+}
+
+.mini-wave.bradycardia polyline {
+  stroke: #60a5fa;
+}
+
+.mini-wave.arrhythmia polyline {
+  stroke: #f87171;
+}
+
+.monitor-vitals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.monitor-vitals span {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 7px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.monitor-vitals strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.waveform-replay-bar {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: auto auto minmax(120px, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.waveform-replay-bar button {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-weight: 800;
+}
+
+.waveform-replay-bar button.active {
+  background: var(--brand);
+  color: white;
+  border-color: var(--brand);
+}
+
+.waveform-replay-bar input {
+  width: 100%;
+}
+
+.waveform-replay-bar span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.compact-mode .multi-monitor-grid {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+}
+
+.compact-mode .monitor-card {
+  padding: 9px;
+}
+
+.compact-mode .mini-wave {
+  height: 48px;
+}
+
+@media (max-width: 780px) {
+  .waveform-replay-bar {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .waveform-replay-bar input,
+  .waveform-replay-bar span {
+    grid-column: 1 / -1;
+  }
+}
+
+.nav-links button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.nav-links button.active,
+.nav-links button:hover {
+  background: var(--brand-soft);
+  color: var(--text);
+}
+
+/* .priority-two-grid {
+  align-items: stretch;
+}
+
+.timeline-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-list {
+  flex: 1;
+  max-height: none;
+  overflow-y: auto;
+} */
+
+.four-monitor-page {
+  height: calc(100vh - 64px - 36px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.four-monitor-header {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.four-monitor-header h1 {
+  margin: 2px 0 0;
+  font-size: 26px;
+}
+
+.four-monitor-header span {
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.four-monitor-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.monitor-slot {
+  min-height: 0;
+  border-radius: 18px;
+}
+
+.monitor-slot.empty {
+  border: 2px dashed var(--line);
+  background: var(--panel);
+  display: grid;
+  place-items: center;
+}
+
+.empty-monitor-slot {
+  text-align: center;
+  color: var(--muted);
+}
+
+.empty-monitor-slot strong {
+  display: block;
+  color: var(--text);
+  font-size: 22px;
+}
+
+.empty-monitor-slot p {
+  margin: 6px 0 0;
+}
+
+.monitor-tile {
+  height: 100%;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.monitor-tile.critical {
+  border-color: var(--danger);
+}
+
+.monitor-tile header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.monitor-tile header strong {
+  display: block;
+  font-size: 20px;
+}
+
+.monitor-tile header span,
+.monitor-tile p {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.monitor-tile header button {
+  border: 0;
+  background: var(--panel-soft);
+  color: var(--muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+}
+
+.mini-wave {
+  flex: 1;
+  min-height: 150px;
+  width: 100%;
+  border-radius: 14px;
+  background:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.mini-wave polyline {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mini-wave.normal polyline {
+  stroke: #34d399;
+}
+
+.mini-wave.tachycardia polyline {
+  stroke: #fbbf24;
+}
+
+.mini-wave.bradycardia polyline {
+  stroke: #60a5fa;
+}
+
+.mini-wave.arrhythmia polyline {
+  stroke: #f87171;
+}
+
+.monitor-vitals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.monitor-vitals span {
+  border: 1px solid var(--line);
+  background: var(--panel-soft);
+  border-radius: 12px;
+  padding: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.monitor-vitals strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--text);
+  font-size: 18px;
+}
+
+/* .priority-two-grid {
+  align-items: stretch;
+}
+
+.timeline-panel {
+  height: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.timeline-header {
+  flex: 0 0 auto;
+}
+
+.timeline-list {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  padding-bottom: 14px;
+}
+
+.dashboard-grid.priority-two-grid {
+  grid-template-columns: minmax(0, 1fr) 330px;
+  align-items: stretch;
+}
+
+.dashboard-grid.priority-two-grid > .patient-column {
+  min-height: 0;
+}
+
+.dashboard-grid.priority-two-grid > .timeline-panel {
+  align-self: stretch;
+} */

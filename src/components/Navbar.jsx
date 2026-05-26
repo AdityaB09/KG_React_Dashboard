@@ -3,7 +3,9 @@ export default function Navbar({
   onSearchChange,
   onSearchFocus,
   onToggleSidebar,
-  alertCount = 0
+  alertCount = 0,
+  activePage,
+  onPageChange
 }) {
   return (
     <header className="navbar">
@@ -25,11 +27,32 @@ export default function Navbar({
       </div>
 
       <nav className="nav-links" aria-label="Main navigation">
-        <a className="active" href="#dashboard">Dashboard</a>
-        <a href="#team">Team</a>
-        <a href="#projects">Projects</a>
-        <a href="#calendar">Calendar</a>
-      </nav>
+  <button
+    className={activePage === "dashboard" ? "active" : ""}
+    onClick={() => onPageChange("dashboard")}
+  >
+    Dashboard
+  </button>
+
+  <button
+    className={activePage === "monitor" ? "active" : ""}
+    onClick={() => onPageChange("monitor")}
+  >
+    Multi Monitor
+  </button>
+
+  <button>
+    Team
+  </button>
+
+  <button>
+    Projects
+  </button>
+
+  <button>
+    Calendar
+  </button>
+</nav>
 
       <div className="nav-profile">
         <button className="icon-btn notification-btn" aria-label="Notifications">

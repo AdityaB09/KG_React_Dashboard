@@ -49,10 +49,14 @@ export default function PatientSidebar({
 
             {unitPatients.map((patient) => (
               <button
-                key={patient.id}
-                className={`patient-row ${selectedPatientId === patient.id ? "selected" : ""}`}
-                onClick={() => onSelectPatient(patient.id)}
-              >
+  key={patient.id}
+  draggable
+  onDragStart={(event) => {
+    event.dataTransfer.setData("patientId", patient.id);
+  }}
+  className={`patient-row ${selectedPatientId === patient.id ? "selected" : ""}`}
+  onClick={() => onSelectPatient(patient.id)}
+>
                 <div className="avatar">{patient.avatar}</div>
                 <div>
                   <strong>{patient.name}</strong>
