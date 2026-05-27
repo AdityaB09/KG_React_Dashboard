@@ -70,11 +70,13 @@ function MonitorTile({ patient, telemetry, onRemove }) {
 
       <MiniWave telemetry={telemetry} />
 
-      <div className="monitor-vitals">
-        <span>HR <strong>{telemetry.heartRate}</strong></span>
-        <span>SpO₂ <strong>{telemetry.oxygen}%</strong></span>
-        <span>BP <strong>{telemetry.systolic}/{telemetry.diastolic}</strong></span>
-      </div>
+      <div className="monitor-vitals monitor-vitals-full">
+  <span>HR <strong>{telemetry.heartRate} bpm</strong></span>
+  <span>SpO₂ <strong>{telemetry.oxygen}%</strong></span>
+  <span>BP <strong>{telemetry.systolic}/{telemetry.diastolic}</strong></span>
+  <span>RR <strong>{telemetry.respiratoryRate}/min</strong></span>
+  <span>Temp <strong>{telemetry.temperature}°F</strong></span>
+</div>
 
       <p>{telemetry.alert}</p>
     </article>
