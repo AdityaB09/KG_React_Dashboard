@@ -1641,3 +1641,22 @@ body.dark-mode .timeline-panel {
   .timeline-list {
   max-height: 365px !important;
 }
+
+.fhir-status-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 12px 14px;
+}
+
+.fhir-status-card strong {
+  display: block;
+  font-size: 14px;
+}
+
+.fhir-status-card p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
