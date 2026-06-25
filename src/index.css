@@ -1660,3 +1660,1098 @@ body.dark-mode .timeline-panel {
   color: var(--muted);
   font-size: 13px;
 }
+
+
+/* ===== KardioGenics Real-Time Physiology Page ===== */
+
+/* .kg-page {
+  min-height: calc(100vh - 104px);
+  background: #f4f6f8;
+  color: #111827;
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kg-header {
+  display: grid;
+  grid-template-columns: 190px 260px minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.kg-brand,
+.kg-patient-strip,
+.kg-title {
+  background: #071827;
+  color: white;
+  border: 2px solid #0e2a3d;
+  border-radius: 6px;
+  min-height: 56px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+}
+
+.kg-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+}
+
+.kg-heart {
+  width: 38px;
+  height: 28px;
+  border-radius: 999px;
+  color: #e53e3e;
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.kg-brand strong {
+  font-size: 18px;
+  letter-spacing: 0.01em;
+}
+
+.kg-patient-strip {
+  padding: 8px 14px;
+  display: grid;
+  align-content: center;
+  border-left: 3px solid rgba(255, 255, 255, 0.22);
+}
+
+.kg-patient-strip strong {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.kg-patient-strip span {
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.85;
+}
+
+.kg-title {
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  font-size: 27px;
+  font-weight: 950;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.kg-title span {
+  margin-left: 8px;
+}
+
+.kg-grid-top {
+  display: grid;
+  grid-template-columns: 1.7fr 0.78fr 0.82fr;
+  gap: 14px;
+}
+
+.kg-grid-bottom {
+  display: grid;
+  grid-template-columns: 0.82fr 1fr 1.4fr;
+  gap: 14px;
+}
+
+.kg-card {
+  background: #f8fafc;
+  border: 2px solid #c7cdd4;
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+}
+
+.kg-card h2 {
+  margin: 0 0 8px;
+  font-size: 17px;
+  line-height: 1.1;
+}
+
+.kg-live-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 94px;
+  gap: 10px;
+}
+
+.kg-wave-stack {
+  display: grid;
+  gap: 6px;
+}
+
+.kg-wave-row {
+  position: relative;
+}
+
+.kg-wave-label {
+  position: absolute;
+  top: 5px;
+  left: 8px;
+  right: 8px;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+.kg-wave-label strong {
+  color: #7f1d1d;
+}
+
+.kg-wave-label span {
+  color: #111827;
+  background: rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
+  padding: 1px 6px;
+  font-weight: 800;
+}
+
+.kg-wave {
+  width: 100%;
+  height: 78px;
+  display: block;
+  background:
+    linear-gradient(#e5e7eb 1px, transparent 1px),
+    linear-gradient(90deg, #e5e7eb 1px, transparent 1px),
+    #ffffff;
+  background-size: 24px 24px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+}
+
+.kg-wave polyline {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.kg-wave.red polyline {
+  stroke: #9b1c1c;
+}
+
+.kg-wave.blue polyline {
+  stroke: #4f8fa6;
+}
+
+.kg-wave.soft polyline {
+  stroke-width: 1.8;
+  opacity: 0.88;
+}
+
+.kg-live-stats {
+  display: grid;
+  gap: 8px;
+}
+
+.kg-stat-mini {
+  background: #ffffff;
+  border-left: 1px solid #d1d5db;
+  padding: 5px 4px 5px 8px;
+  min-height: 70px;
+}
+
+.kg-stat-mini span {
+  display: block;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.kg-stat-mini strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 24px;
+  line-height: 1;
+  color: #991b1b;
+}
+
+.kg-stat-mini strong small {
+  font-size: 13px;
+  margin-left: 1px;
+}
+
+.kg-sparkline {
+  width: 72px;
+  height: 30px;
+  margin-top: 4px;
+}
+
+.kg-sparkline polyline {
+  fill: none;
+  stroke: #9b1c1c;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kg-sparkline.blue polyline {
+  stroke: #3b82a0;
+}
+
+.kg-lab-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.kg-lab-grid.compact {
+  margin-bottom: 8px;
+}
+
+.kg-lab-card {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #cfd6de;
+  border-radius: 8px;
+  padding: 8px;
+  min-height: 92px;
+}
+
+.kg-lab-card div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kg-lab-card span {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.kg-lab-card button {
+  border: 0;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  color: #1f2937;
+}
+
+.kg-lab-card strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 28px;
+  line-height: 1;
+  color: #991b1b;
+}
+
+.kg-lab-card small {
+  display: block;
+  margin-top: 3px;
+  font-size: 9px;
+  color: #7f1d1d;
+  font-weight: 800;
+}
+
+.kg-lab-card em {
+  position: absolute;
+  right: 8px;
+  bottom: 7px;
+  font-style: normal;
+  font-size: 10px;
+  color: #111827;
+  font-weight: 900;
+}
+
+.kg-lab-card .kg-sparkline {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  width: 54px;
+  height: 24px;
+}
+
+.kg-lab-card.compact {
+  min-height: 90px;
+}
+
+.kg-mini-table {
+  margin: 8px 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid #d5dbe3;
+}
+
+.kg-mini-table span,
+.kg-mini-table b {
+  background: #eef0f3;
+  padding: 4px 6px;
+  text-align: center;
+  font-size: 11px;
+}
+
+.kg-mini-table b {
+  background: #ffffff;
+  font-size: 11px;
+}
+
+.kg-access-btn {
+  width: 100%;
+  border: 0;
+  border-radius: 5px;
+  padding: 8px 10px;
+  background: #1f6fa8;
+  color: white;
+  font-weight: 900;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.kg-alert-card {
+  border-color: #8b2b2b;
+  background: #f8e6e2;
+}
+
+.kg-alert-card h2 {
+  color: #111827;
+}
+
+.kg-alert-body {
+  background: #f4d7d3;
+  border: 1px solid #b56b65;
+  border-radius: 8px;
+  padding: 14px;
+  min-height: 250px;
+  position: relative;
+}
+
+.kg-alert-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: #a91f1f;
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+  font-weight: 950;
+}
+
+.kg-alert-body h3 {
+  margin: 0 0 12px;
+  font-size: 17px;
+  text-align: center;
+  color: #7f1d1d;
+}
+
+.kg-alert-body p {
+  margin: 9px 0;
+  font-size: 11px;
+  line-height: 1.25;
+  color: #111827;
+}
+
+.kg-vitals-log table,
+.kg-med-card table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.kg-vitals-log th,
+.kg-med-card th {
+  background: #dfe3e8;
+  color: #111827;
+  font-size: 11px;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 7px 8px;
+}
+
+.kg-vitals-log td,
+.kg-med-card td {
+  border-bottom: 1px solid #d7dde5;
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.kg-med-card td strong {
+  display: block;
+  font-size: 13px;
+}
+
+.kg-med-card td small {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  color: #334155;
+}
+
+.kg-taken,
+.kg-missed {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  color: white;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.kg-taken {
+  background: #2f9e44;
+}
+
+.kg-missed {
+  background: #a61e1e;
+}
+
+.kg-footer {
+  margin-top: auto;
+  min-height: 30px;
+  background: #071827;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 22px;
+  font-size: 12px;
+  font-weight: 750;
+  text-align: center;
+  padding: 5px 12px;
+}
+
+.kg-footer strong {
+  color: #e5e7eb;
+}
+
+body.dark-mode .kg-page {
+  background: #f4f6f8;
+  color: #111827;
+}
+
+@media (max-width: 1300px) {
+  .kg-header {
+    grid-template-columns: 1fr;
+  }
+
+  .kg-grid-top,
+  .kg-grid-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .kg-live-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .kg-live-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 780px) {
+  .kg-title {
+    font-size: 20px;
+  }
+
+  .kg-lab-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kg-live-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .kg-footer {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+/* ===== Exact KardioGenics Physiology Page Override ===== */
+
+/* .dashboard-main:has(.kg-page) {
+  padding: 14px 16px 18px;
+  overflow: auto;
+  background: #f4f6f8;
+}
+
+.kg-page,
+.kg-page * {
+  box-sizing: border-box;
+}
+
+.kg-page {
+  width: 100%;
+  min-width: 1180px;
+  min-height: auto;
+  height: auto;
+  background: #f4f6f8;
+  color: #101827;
+  display: grid;
+  grid-template-rows: 56px 1fr 30px;
+  gap: 10px;
+  border-radius: 0;
+  overflow: visible;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.kg-header {
+  display: grid !important;
+  grid-template-columns: 190px 270px minmax(0, 1fr) !important;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.kg-brand-block,
+.kg-patient-block,
+.kg-title-block {
+  background: #061927;
+  color: #ffffff;
+  border: 2px solid #0c2c3f;
+  border-radius: 6px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+}
+
+.kg-brand-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+}
+
+.kg-logo-mark {
+  color: #e5363f;
+  font-size: 34px;
+  line-height: 1;
+  font-weight: 950;
+  transform: rotate(12deg);
+}
+
+.kg-brand-block span {
+  font-size: 20px;
+  font-weight: 750;
+}
+
+.kg-patient-block {
+  padding: 8px 14px;
+  display: grid;
+  align-content: center;
+}
+
+.kg-patient-block strong {
+  display: block;
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.kg-patient-block span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 850;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.kg-title-block {
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 26px;
+  font-weight: 950;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.kg-title-block span {
+  margin-left: 7px;
+}
+
+.kg-main-grid {
+  display: grid;
+  grid-template-columns: 1.58fr 0.72fr 0.78fr;
+  grid-template-rows: 300px 170px;
+  gap: 14px;
+}
+
+.kg-card {
+  background: #f8fafc;
+  border: 2px solid #c4cbd3;
+  border-radius: 9px;
+  padding: 9px 11px;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.kg-card h2 {
+  margin: 0 0 8px;
+  font-size: 17px;
+  line-height: 1.1;
+  font-weight: 950;
+  color: #111827;
+}
+
+.kg-live {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.kg-labs {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.kg-alert {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.kg-labs-small {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.kg-vital-log {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.kg-med {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.kg-live-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  gap: 9px;
+}
+
+.kg-waves {
+  display: grid;
+  gap: 6px;
+}
+
+.kg-wave-panel {
+  height: 74px;
+  position: relative;
+  background:
+    linear-gradient(#e4e9ef 1px, transparent 1px),
+    linear-gradient(90deg, #e4e9ef 1px, transparent 1px),
+    #ffffff;
+  background-size: 28px 28px;
+  border: 1px solid #c9d1da;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.kg-wave-panel.small {
+  height: 40px;
+}
+
+.kg-wave-panel svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.kg-wave-panel polyline {
+  fill: none;
+  stroke: #a51e22;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.kg-wave-panel:has(.kg-wave-name.blue) polyline,
+.kg-wave-panel:nth-child(4) polyline {
+  stroke: #4f94aa;
+}
+
+.kg-wave-panel.small polyline {
+  stroke-width: 1.9;
+}
+
+.kg-wave-name {
+  position: absolute;
+  top: 6px;
+  left: 9px;
+  z-index: 2;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.kg-wave-name.red {
+  color: #991b1b;
+}
+
+.kg-wave-name.blue {
+  color: #1d617c;
+}
+
+.kg-wave-time {
+  position: absolute;
+  top: 7px;
+  right: 14px;
+  z-index: 2;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.kg-time-row {
+  margin-top: 5px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 12px;
+  color: #111827;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.kg-side-vitals {
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.kg-side-vital {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  background: #ffffff;
+  border-left: 1px solid #d7dde5;
+  padding: 5px 4px 3px 7px;
+}
+
+.kg-side-vital span {
+  display: block;
+  color: #111827;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.kg-side-vital strong {
+  display: block;
+  color: #991b1b;
+  font-size: 25px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.kg-side-vital strong.blue {
+  color: #1d617c;
+}
+
+.kg-mini-trend {
+  width: 74px;
+  height: 28px;
+  align-self: end;
+}
+
+.kg-mini-trend polyline {
+  fill: none;
+  stroke: #a51e22;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kg-mini-trend.blue polyline {
+  stroke: #4f94aa;
+}
+
+.kg-lab-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px;
+}
+
+.kg-lab-grid.small-grid {
+  margin-bottom: 9px;
+}
+
+.kg-lab-tile {
+  height: 82px;
+  background: #ffffff;
+  border: 1px solid #cbd3dc;
+  border-radius: 7px;
+  padding: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.kg-lab-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kg-lab-top span {
+  font-size: 12px;
+  font-weight: 950;
+  color: #111827;
+}
+
+.kg-lab-top button {
+  border: 0;
+  background: transparent;
+  color: #111827;
+  font-size: 20px;
+  line-height: 1;
+  padding: 0;
+}
+
+.kg-lab-tile strong {
+  display: block;
+  margin-top: 4px;
+  color: #991b1b;
+  font-size: 27px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.kg-lab-meta {
+  display: grid;
+  grid-template-columns: 1fr 50px auto;
+  align-items: end;
+  gap: 3px;
+}
+
+.kg-lab-meta small {
+  color: #7f1d1d;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.kg-lab-meta .kg-mini-trend {
+  width: 50px;
+  height: 20px;
+}
+
+.kg-lab-meta em {
+  font-style: normal;
+  color: #111827;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.kg-lab-table-mini {
+  margin: 8px 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid #d2d8df;
+}
+
+.kg-lab-table-mini span,
+.kg-lab-table-mini b {
+  min-height: 20px;
+  display: grid;
+  place-items: center;
+  background: #e4e7eb;
+  color: #111827;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.kg-lab-table-mini b {
+  background: #f7f8fa;
+}
+
+.kg-blue-btn {
+  width: 100%;
+  border: 0;
+  border-radius: 5px;
+  background: #1e6da6;
+  color: #ffffff;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-weight: 850;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.kg-alert {
+  background: #f5e2df;
+  border-color: #8f312e;
+}
+
+.kg-alert-box {
+  height: calc(100% - 28px);
+  background: #f1d5d1;
+  border: 1px solid #b46a63;
+  border-radius: 8px;
+  padding: 12px 14px;
+  overflow: hidden;
+}
+
+.kg-alert-symbol {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #a51e22;
+  color: #ffffff;
+  font-size: 33px;
+  font-weight: 950;
+}
+
+.kg-alert-box h3 {
+  margin: 0 0 10px;
+  color: #7f1d1d;
+  font-size: 17px;
+  text-align: center;
+  font-weight: 950;
+}
+
+.kg-alert-box p {
+  margin: 8px 0;
+  color: #111827;
+  font-size: 10.5px;
+  line-height: 1.18;
+  font-weight: 650;
+}
+
+.kg-vital-log table,
+.kg-med table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.kg-vital-log th,
+.kg-med th {
+  background: #dde1e6;
+  color: #111827;
+  text-align: left;
+  text-transform: uppercase;
+  padding: 7px 8px;
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.kg-vital-log td,
+.kg-med td {
+  border-bottom: 1px solid #d5dbe3;
+  color: #111827;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.kg-med td strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.kg-med td small {
+  display: block;
+  margin-top: 2px;
+  font-size: 9px;
+  color: #334155;
+  font-weight: 800;
+}
+
+.kg-ok,
+.kg-no {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.kg-ok {
+  background: #2f9e44;
+}
+
+.kg-no {
+  background: #a51e22;
+}
+
+.kg-warning {
+  color: #a51e22;
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.kg-footer {
+  height: 30px;
+  min-height: 30px;
+  margin: 0;
+  background: #061927;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 750;
+  text-align: center;
+  border-radius: 0;
+}
+
+.kg-footer b {
+  color: #ffffff;
+  font-size: 13px;
+}
+*/
+/* Do not stack the physiology page like normal responsive cards */
+/*
+@media (max-width: 1300px) {
+  .kg-header {
+    grid-template-columns: 190px 270px minmax(0, 1fr) !important;
+  }
+
+  .kg-main-grid {
+    grid-template-columns: 1.58fr 0.72fr 0.78fr !important;
+    grid-template-rows: 300px 170px !important;
+  }
+
+  .kg-live {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+
+  .kg-labs {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  .kg-alert {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+  }
+
+  .kg-labs-small {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+  }
+
+  .kg-vital-log {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+  }
+
+  .kg-med {
+    grid-column: 3 !important;
+    grid-row: 2 !important;
+  }
+
+  .kg-live-inner {
+    grid-template-columns: minmax(0, 1fr) 92px !important;
+  }
+} */ 

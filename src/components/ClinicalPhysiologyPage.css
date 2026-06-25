@@ -1,0 +1,664 @@
+.dashboard-main:has(.kgen-page) {
+  padding: 10px 14px 18px;
+  background: #f3f5f7;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.kgen-page,
+.kgen-page * {
+  box-sizing: border-box;
+}
+
+.kgen-page {
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  color: #050b14;
+  background: #f3f5f7;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.kgen-topbar {
+  display: grid;
+  grid-template-columns: 220px 305px minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.kgen-brand-box,
+.kgen-patient-box,
+.kgen-title-box {
+  min-height: 60px;
+  background: #061927;
+  color: #ffffff;
+  border: 2px solid #17394c;
+  border-radius: 6px;
+  box-shadow: 0 4px 0 rgba(5, 15, 24, 0.22);
+}
+
+.kgen-brand-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+}
+
+.kgen-logo {
+  color: #ef4444;
+  font-size: 34px;
+  font-weight: 950;
+  transform: rotate(12deg);
+}
+
+.kgen-brand-box span {
+  font-size: 20px;
+  font-weight: 850;
+}
+
+.kgen-patient-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8px 14px;
+}
+
+.kgen-patient-box strong {
+  font-size: 26px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.kgen-patient-box span {
+  margin-top: 5px;
+  font-size: 11px;
+  font-weight: 850;
+  color: rgba(255, 255, 255, 0.88);
+  white-space: nowrap;
+}
+
+.kgen-title-box {
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  font-size: clamp(19px, 1.7vw, 24px);
+  font-weight: 950;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  white-space: normal;
+  overflow: visible;
+}
+
+.kgen-title-box span {
+  margin-left: 7px;
+}
+
+.kgen-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: auto;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.kgen-panel {
+  background: #f8fafc;
+  border: 2px solid #c5ccd4;
+  border-radius: 10px;
+  padding: 10px 12px;
+  overflow: visible;
+  min-width: 0;
+}
+
+.kgen-panel h2 {
+  margin: 0 0 9px;
+  color: #050b14;
+  font-size: 18px;
+  line-height: 1.1;
+  font-weight: 950;
+}
+
+.kgen-live-panel {
+  grid-column: 1 / span 6;
+  grid-row: 1;
+}
+
+.kgen-labs-panel {
+  grid-column: 7 / span 3;
+  grid-row: 1;
+}
+
+.kgen-alert-panel {
+  grid-column: 10 / span 3;
+  grid-row: 1;
+  background: #f6e1de;
+  border-color: #9b322f;
+}
+
+.kgen-labs-small-panel {
+  grid-column: 1 / span 3;
+  grid-row: 2;
+}
+
+.kgen-vitals-panel {
+  grid-column: 4 / span 4;
+  grid-row: 2;
+}
+
+.kgen-med-panel {
+  grid-column: 8 / span 5;
+  grid-row: 2;
+}
+
+.kgen-panel-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+
+.kgen-panel-title-row h2 {
+  margin: 0;
+}
+
+.kgen-live-pill {
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+  animation: kgenPulse 1.2s infinite ease-in-out;
+}
+
+@keyframes kgenPulse {
+  0%, 100% {
+    opacity: 0.65;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.kgen-live-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 105px;
+  gap: 10px;
+}
+
+.kgen-wave-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.kgen-wave-card {
+  position: relative;
+  height: 64px;
+  background:
+    linear-gradient(#e1e7ee 1px, transparent 1px),
+    linear-gradient(90deg, #e1e7ee 1px, transparent 1px),
+    #ffffff;
+  background-size: 30px 30px;
+  border: 1px solid #cbd4df;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.kgen-wave-card.compact {
+  height: 42px;
+}
+
+.kgen-wave-card svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.kgen-wave-card polyline {
+  fill: none;
+  stroke: #a51e22;
+  stroke-width: 2.15;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  transition: all 0.25s linear;
+}
+
+.kgen-wave-card.blue polyline {
+  stroke: #4d92a8;
+}
+
+.kgen-wave-card.compact polyline {
+  stroke-width: 1.9;
+}
+
+.kgen-wave-label {
+  position: absolute;
+  top: 6px;
+  left: 10px;
+  z-index: 2;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.kgen-wave-label.red {
+  color: #991b1b;
+}
+
+.kgen-wave-label.blue {
+  color: #1d617c;
+}
+
+.kgen-current-time {
+  position: absolute;
+  top: 7px;
+  right: 14px;
+  z-index: 2;
+  color: #050b14;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.kgen-time-axis {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  color: #050b14;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.kgen-side-vitals {
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 8px;
+  min-width: 0;
+}
+
+.kgen-side-vital {
+  background: #ffffff;
+  border-left: 1px solid #d5dce4;
+  padding: 7px 6px 5px 9px;
+  min-height: 75px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.kgen-side-vital span {
+  display: block;
+  color: #050b14;
+  font-size: 11px;
+  line-height: 1.1;
+  font-weight: 950;
+}
+
+.kgen-side-vital strong {
+  display: block;
+  margin-top: 2px;
+  color: #991b1b;
+  font-size: 27px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.kgen-side-vital strong.blue {
+  color: #1d617c;
+}
+
+.kgen-mini-trend {
+  width: 100%;
+  height: 28px;
+}
+
+.kgen-mini-trend polyline {
+  fill: none;
+  stroke: #a51e22;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: all 0.25s linear;
+}
+
+.kgen-mini-trend.blue polyline {
+  stroke: #4d92a8;
+}
+
+.kgen-lab-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.kgen-lab-grid.small {
+  margin-bottom: 10px;
+}
+
+.kgen-lab-tile {
+  min-height: 86px;
+  background: #ffffff;
+  border: 1px solid #cbd4df;
+  border-radius: 8px;
+  padding: 8px;
+  overflow: visible;
+}
+
+.kgen-lab-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kgen-lab-title span {
+  color: #050b14;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.kgen-lab-title button {
+  border: 0;
+  background: transparent;
+  color: #050b14;
+  font-size: 22px;
+  line-height: 1;
+  padding: 0;
+}
+
+.kgen-lab-tile strong {
+  display: block;
+  margin-top: 4px;
+  color: #991b1b;
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.kgen-lab-bottom {
+  margin-top: 4px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 54px auto;
+  gap: 4px;
+  align-items: end;
+}
+
+.kgen-lab-bottom small {
+  color: #7f1d1d;
+  font-size: 9px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.kgen-lab-bottom em {
+  color: #050b14;
+  font-style: normal;
+  font-size: 9px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.kgen-lab-bottom .kgen-mini-trend {
+  height: 22px;
+}
+
+.kgen-mini-table {
+  margin: 9px 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
+  border: 1px solid #d2d8df;
+  border-radius: 5px;
+}
+
+.kgen-mini-table span,
+.kgen-mini-table b {
+  min-height: 22px;
+  display: grid;
+  place-items: center;
+  background: #e3e7ec;
+  color: #050b14;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.kgen-mini-table b {
+  background: #f7f8fa;
+}
+
+.kgen-blue-btn {
+  width: 100%;
+  border: 0;
+  border-radius: 5px;
+  background: #1f70a7;
+  color: white;
+  padding: 8px 10px;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 900;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.kgen-alert-box {
+  min-height: 270px;
+  background: #f0d1cd;
+  border: 1px solid #b66560;
+  border-radius: 8px;
+  padding: 14px 16px;
+  overflow: visible;
+}
+
+.kgen-alert-icon {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 12px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #a51e22;
+  color: white;
+  font-size: 38px;
+  font-weight: 950;
+}
+
+.kgen-alert-box h3 {
+  margin: 0 0 12px;
+  color: #7f1d1d;
+  font-size: 18px;
+  line-height: 1.15;
+  text-align: center;
+  font-weight: 950;
+}
+
+.kgen-alert-box p {
+  margin: 9px 0;
+  color: #050b14;
+  font-size: 11.5px;
+  line-height: 1.25;
+  font-weight: 650;
+}
+
+.kgen-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.kgen-table th {
+  background: #dde2e8;
+  color: #050b14;
+  text-align: left;
+  text-transform: uppercase;
+  padding: 8px 9px;
+  font-size: 10.5px;
+  line-height: 1.1;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.kgen-table td {
+  border-bottom: 1px solid #d4dbe3;
+  color: #050b14;
+  padding: 9px;
+  font-size: 13px;
+  line-height: 1.15;
+  font-weight: 850;
+  vertical-align: middle;
+}
+
+.kgen-table.vitals th:nth-child(1),
+.kgen-table.vitals td:nth-child(1) {
+  width: 38%;
+}
+
+.kgen-table.vitals th:nth-child(2),
+.kgen-table.vitals td:nth-child(2) {
+  width: 22%;
+}
+
+.kgen-table.vitals th:nth-child(3),
+.kgen-table.vitals td:nth-child(3) {
+  width: 18%;
+}
+
+.kgen-table.vitals th:nth-child(4),
+.kgen-table.vitals td:nth-child(4) {
+  width: 22%;
+  white-space: nowrap;
+}
+
+.kgen-table.meds th:nth-child(1),
+.kgen-table.meds td:nth-child(1) {
+  width: 42%;
+}
+
+.kgen-table.meds th:nth-child(2),
+.kgen-table.meds td:nth-child(2) {
+  width: 16%;
+}
+
+.kgen-table.meds th:nth-child(3),
+.kgen-table.meds td:nth-child(3) {
+  width: 22%;
+}
+
+.kgen-table.meds th:nth-child(4),
+.kgen-table.meds td:nth-child(4) {
+  width: 20%;
+  white-space: nowrap;
+}
+
+.kgen-table td strong {
+  display: block;
+  font-size: 13px;
+  line-height: 1.05;
+  font-weight: 950;
+}
+
+.kgen-table td small {
+  display: block;
+  margin-top: 3px;
+  color: #334155;
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.kgen-ok,
+.kgen-no {
+  display: inline-grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  color: white;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.kgen-ok {
+  background: #2f9e44;
+}
+
+.kgen-no {
+  background: #a51e22;
+}
+
+.kgen-warning {
+  color: #a51e22;
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.kgen-footer {
+  min-height: 30px;
+  background: #061927;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  padding: 5px 12px;
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 800;
+  text-align: center;
+}
+
+.kgen-footer strong {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+body.dark-mode .kgen-page {
+  background: #f3f5f7;
+  color: #050b14;
+}
+
+@media (max-width: 1180px) {
+  .kgen-topbar {
+    grid-template-columns: 1fr;
+  }
+
+  .kgen-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kgen-live-panel,
+  .kgen-labs-panel,
+  .kgen-alert-panel,
+  .kgen-labs-small-panel,
+  .kgen-vitals-panel,
+  .kgen-med-panel {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .kgen-live-content {
+    grid-template-columns: 1fr;
+  }
+
+  .kgen-side-vitals {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: none;
+  }
+
+  .kgen-lab-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kgen-footer {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
