@@ -317,8 +317,8 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
         </div>
 
         <div className="kgen-title-box">
-          CLINICAL DASHBOARD <span>(REAL-TIME PHYSIOLOGY MONITOR)</span>
-        </div>
+  <span>CLINICAL DASHBOARD (REAL-TIME PHYSIOLOGY MONITOR)</span>
+</div>
       </header>
 
       <main className="kgen-grid">

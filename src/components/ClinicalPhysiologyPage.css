@@ -22,9 +22,11 @@
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+/* ===== TOP HEADER FIX ===== */
+
 .kgen-topbar {
   display: grid;
-  grid-template-columns: 220px 305px minmax(0, 1fr);
+  grid-template-columns: 215px 310px minmax(0, 1fr);
   gap: 12px;
   align-items: stretch;
 }
@@ -32,7 +34,7 @@
 .kgen-brand-box,
 .kgen-patient-box,
 .kgen-title-box {
-  min-height: 60px;
+  min-height: 58px;
   background: #061927;
   color: #ffffff;
   border: 2px solid #17394c;
@@ -45,18 +47,21 @@
   align-items: center;
   gap: 12px;
   padding: 0 18px;
+  min-width: 0;
 }
 
 .kgen-logo {
   color: #ef4444;
-  font-size: 34px;
+  font-size: 32px;
   font-weight: 950;
   transform: rotate(12deg);
+  flex: 0 0 auto;
 }
 
 .kgen-brand-box span {
   font-size: 20px;
   font-weight: 850;
+  white-space: nowrap;
 }
 
 .kgen-patient-box {
@@ -64,12 +69,16 @@
   flex-direction: column;
   justify-content: center;
   padding: 8px 14px;
+  min-width: 0;
 }
 
 .kgen-patient-box strong {
-  font-size: 26px;
+  font-size: 24px;
   line-height: 1;
   font-weight: 950;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .kgen-patient-box span {
@@ -78,23 +87,30 @@
   font-weight: 850;
   color: rgba(255, 255, 255, 0.88);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .kgen-title-box {
   display: flex;
   align-items: center;
   padding: 0 18px;
-  font-size: clamp(19px, 1.7vw, 24px);
+  font-size: clamp(17px, 1.28vw, 20px);
   font-weight: 950;
-  line-height: 1.1;
+  line-height: 1;
   letter-spacing: 0.01em;
-  white-space: normal;
-  overflow: visible;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  min-width: 0;
 }
 
 .kgen-title-box span {
-  margin-left: 7px;
+  margin-left: 6px;
+  white-space: nowrap;
 }
+
+/* ===== GRID LAYOUT ===== */
 
 .kgen-grid {
   display: grid;
@@ -114,21 +130,23 @@
 }
 
 .kgen-panel h2 {
-  margin: 0 0 9px;
+  margin: 0 0 8px;
   color: #050b14;
-  font-size: 18px;
-  line-height: 1.1;
+  font-size: 17px;
+  line-height: 1.08;
   font-weight: 950;
 }
 
 .kgen-live-panel {
   grid-column: 1 / span 6;
   grid-row: 1;
+  min-height: 0;
 }
 
 .kgen-labs-panel {
   grid-column: 7 / span 3;
   grid-row: 1;
+  min-height: 0;
 }
 
 .kgen-alert-panel {
@@ -136,8 +154,10 @@
   grid-row: 1;
   background: #f6e1de;
   border-color: #9b322f;
+  min-height: 0;
 }
 
+/* second row placement is kept the same */
 .kgen-labs-small-panel {
   grid-column: 1 / span 3;
   grid-row: 2;
@@ -153,12 +173,14 @@
   grid-row: 2;
 }
 
+/* ===== LIVE PHYSIOLOGY TOP CARD ===== */
+
 .kgen-panel-title-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  margin-bottom: 9px;
+  margin-bottom: 8px;
 }
 
 .kgen-panel-title-row h2 {
@@ -171,14 +193,15 @@
   border: 1px solid #fecaca;
   border-radius: 999px;
   padding: 4px 8px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
   white-space: nowrap;
   animation: kgenPulse 1.2s infinite ease-in-out;
 }
 
 @keyframes kgenPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.65;
   }
 
@@ -189,20 +212,21 @@
 
 .kgen-live-content {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 105px;
+  grid-template-columns: minmax(0, 1fr) 108px;
   gap: 10px;
+  align-items: start;
 }
 
 .kgen-wave-stack {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   min-width: 0;
 }
 
 .kgen-wave-card {
   position: relative;
-  height: 64px;
+  height: 60px;
   background:
     linear-gradient(#e1e7ee 1px, transparent 1px),
     linear-gradient(90deg, #e1e7ee 1px, transparent 1px),
@@ -214,7 +238,7 @@
 }
 
 .kgen-wave-card.compact {
-  height: 42px;
+  height: 39px;
 }
 
 .kgen-wave-card svg {
@@ -226,7 +250,7 @@
 .kgen-wave-card polyline {
   fill: none;
   stroke: #a51e22;
-  stroke-width: 2.15;
+  stroke-width: 2.05;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
@@ -238,7 +262,7 @@
 }
 
 .kgen-wave-card.compact polyline {
-  stroke-width: 1.9;
+  stroke-width: 1.8;
 }
 
 .kgen-wave-label {
@@ -246,7 +270,7 @@
   top: 6px;
   left: 10px;
   z-index: 2;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 950;
 }
 
@@ -264,7 +288,7 @@
   right: 14px;
   z-index: 2;
   color: #050b14;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 900;
 }
 
@@ -280,15 +304,15 @@
 .kgen-side-vitals {
   display: grid;
   grid-template-rows: repeat(3, 1fr);
-  gap: 8px;
+  gap: 7px;
   min-width: 0;
 }
 
 .kgen-side-vital {
   background: #ffffff;
   border-left: 1px solid #d5dce4;
-  padding: 7px 6px 5px 9px;
-  min-height: 75px;
+  padding: 6px 6px 4px 9px;
+  min-height: 68px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -297,16 +321,16 @@
 .kgen-side-vital span {
   display: block;
   color: #050b14;
-  font-size: 11px;
+  font-size: 10.5px;
   line-height: 1.1;
   font-weight: 950;
 }
 
 .kgen-side-vital strong {
   display: block;
-  margin-top: 2px;
+  margin-top: 1px;
   color: #991b1b;
-  font-size: 27px;
+  font-size: 25px;
   line-height: 1;
   font-weight: 950;
 }
@@ -317,7 +341,7 @@
 
 .kgen-mini-trend {
   width: 100%;
-  height: 28px;
+  height: 24px;
 }
 
 .kgen-mini-trend polyline {
@@ -333,10 +357,12 @@
   stroke: #4d92a8;
 }
 
+/* ===== TOP LAB CARD ===== */
+
 .kgen-lab-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 7px;
 }
 
 .kgen-lab-grid.small {
@@ -344,11 +370,11 @@
 }
 
 .kgen-lab-tile {
-  min-height: 86px;
+  min-height: 78px;
   background: #ffffff;
   border: 1px solid #cbd4df;
   border-radius: 8px;
-  padding: 8px;
+  padding: 7px;
   overflow: visible;
 }
 
@@ -360,7 +386,7 @@
 
 .kgen-lab-title span {
   color: #050b14;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 950;
 }
 
@@ -368,31 +394,31 @@
   border: 0;
   background: transparent;
   color: #050b14;
-  font-size: 22px;
+  font-size: 21px;
   line-height: 1;
   padding: 0;
 }
 
 .kgen-lab-tile strong {
   display: block;
-  margin-top: 4px;
+  margin-top: 3px;
   color: #991b1b;
-  font-size: 28px;
+  font-size: 25px;
   line-height: 1;
   font-weight: 950;
 }
 
 .kgen-lab-bottom {
-  margin-top: 4px;
+  margin-top: 3px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 54px auto;
+  grid-template-columns: minmax(0, 1fr) 50px auto;
   gap: 4px;
   align-items: end;
 }
 
 .kgen-lab-bottom small {
   color: #7f1d1d;
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 850;
   white-space: nowrap;
 }
@@ -400,17 +426,17 @@
 .kgen-lab-bottom em {
   color: #050b14;
   font-style: normal;
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 950;
   white-space: nowrap;
 }
 
 .kgen-lab-bottom .kgen-mini-trend {
-  height: 22px;
+  height: 20px;
 }
 
 .kgen-mini-table {
-  margin: 9px 0;
+  margin: 8px 0;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   overflow: hidden;
@@ -420,12 +446,12 @@
 
 .kgen-mini-table span,
 .kgen-mini-table b {
-  min-height: 22px;
+  min-height: 19px;
   display: grid;
   place-items: center;
   background: #e3e7ec;
   color: #050b14;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
 }
 
@@ -439,51 +465,54 @@
   border-radius: 5px;
   background: #1f70a7;
   color: white;
-  padding: 8px 10px;
-  font-size: 13px;
+  padding: 7px 10px;
+  font-size: 12.5px;
   line-height: 1;
   font-weight: 900;
   box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18);
 }
 
+/* ===== CRITICAL ALERT TOP CARD ===== */
+
 .kgen-alert-box {
-  min-height: 270px;
   background: #f0d1cd;
   border: 1px solid #b66560;
   border-radius: 8px;
-  padding: 14px 16px;
+  padding: 12px 14px;
   overflow: visible;
 }
 
 .kgen-alert-icon {
-  width: 54px;
-  height: 54px;
-  margin: 0 auto 12px;
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 10px;
   display: grid;
   place-items: center;
   border-radius: 50%;
   background: #a51e22;
   color: white;
-  font-size: 38px;
+  font-size: 32px;
   font-weight: 950;
 }
 
 .kgen-alert-box h3 {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   color: #7f1d1d;
-  font-size: 18px;
-  line-height: 1.15;
+  font-size: 16px;
+  line-height: 1.12;
   text-align: center;
   font-weight: 950;
 }
 
 .kgen-alert-box p {
-  margin: 9px 0;
+  margin: 7px 0;
   color: #050b14;
-  font-size: 11.5px;
-  line-height: 1.25;
+  font-size: 10px;
+  line-height: 1.18;
   font-weight: 650;
 }
+
+/* ===== SECOND ROW TABLES KEPT STABLE ===== */
 
 .kgen-table {
   width: 100%;
@@ -598,6 +627,8 @@
   font-weight: 950;
 }
 
+/* ===== FOOTER ===== */
+
 .kgen-footer {
   min-height: 30px;
   background: #061927;
@@ -623,9 +654,21 @@ body.dark-mode .kgen-page {
   color: #050b14;
 }
 
+/* ===== RESPONSIVE ===== */
+
 @media (max-width: 1180px) {
   .kgen-topbar {
     grid-template-columns: 1fr;
+  }
+
+  .kgen-title-box {
+    white-space: normal;
+    line-height: 1.15;
+    min-height: 58px;
+  }
+
+  .kgen-title-box span {
+    white-space: normal;
   }
 
   .kgen-grid {
