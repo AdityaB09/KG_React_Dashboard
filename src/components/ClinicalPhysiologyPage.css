@@ -1487,3 +1487,141 @@ body.dark-mode .kgen-page {
   line-height: 1.18;
   margin: 7px 0;
 }
+
+/* ===== MINI TREND BOX + GLOW FIX FOR 01 SIDE VITALS AND 03 LAB CARDS ===== */
+
+/* Generic mini trend box */
+.kgen-mini-trend-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f8fb 100%);
+  border: 1px solid #d7dee7;
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(15, 23, 42, 0.05);
+  overflow: hidden;
+}
+
+/* Slight tinted chart box feel like the reference */
+.kgen-mini-trend-box.red {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 244, 244, 0.96) 100%);
+}
+
+.kgen-mini-trend-box.blue {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(243, 250, 255, 0.96) 100%);
+}
+
+/* SVG itself */
+.kgen-mini-trend {
+  width: 100%;
+  height: 100%;
+  display: block;
+  padding: 2px 3px;
+}
+
+/* Red trend line */
+.kgen-mini-trend.red polyline {
+  fill: none;
+  stroke: #bb1e22;
+  stroke-width: 1.95;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter:
+    drop-shadow(0 0 2px rgba(187, 30, 34, 0.22))
+    drop-shadow(0 0 5px rgba(187, 30, 34, 0.12));
+}
+
+/* Blue trend line */
+.kgen-mini-trend.blue polyline {
+  fill: none;
+  stroke: #5a97af;
+  stroke-width: 1.95;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter:
+    drop-shadow(0 0 2px rgba(90, 151, 175, 0.22))
+    drop-shadow(0 0 5px rgba(90, 151, 175, 0.12));
+}
+
+/* ---------- 01 SIDE VITALS ---------- */
+
+.kgen-live-panel .kgen-side-vital {
+  gap: 6px;
+}
+
+.kgen-live-panel .kgen-side-vital .kgen-mini-trend-box {
+  width: 100%;
+  height: 34px;
+  min-height: 34px;
+  border-radius: 7px;
+}
+
+/* Make the side-vital mini chart feel visually anchored */
+.kgen-live-panel .kgen-side-vital .kgen-mini-trend {
+  padding: 3px 4px;
+}
+
+/* ---------- 03 TOP LAB CARDS ---------- */
+
+/* Give the sparkline its own real space in the bottom row */
+.kgen-lab-bottom {
+  margin-top: 4px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 62px auto;
+  gap: 5px;
+  align-items: end;
+}
+
+/* Mini chart box inside each lab card */
+.kgen-lab-bottom .kgen-mini-trend-box {
+  width: 62px;
+  height: 24px;
+  min-height: 24px;
+  justify-self: end;
+  border-radius: 7px;
+}
+
+/* Tighten lab text so it does not visually collide */
+.kgen-lab-bottom small {
+  line-height: 1;
+}
+
+.kgen-lab-bottom em {
+  line-height: 1;
+}
+
+/* Optional: slightly cleaner value area */
+.kgen-lab-tile strong {
+  margin-bottom: 1px;
+}
+
+/* ---------- Extra polish so it matches reference better ---------- */
+
+/* Small rightward visual balance */
+.kgen-side-vital .kgen-mini-trend-box,
+.kgen-lab-bottom .kgen-mini-trend-box {
+  border-color: #d5dce4;
+}
+
+/* Slight inner top shine */
+.kgen-mini-trend-box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.38) 0%,
+    rgba(255, 255, 255, 0.02) 48%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}

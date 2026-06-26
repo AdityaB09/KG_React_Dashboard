@@ -263,9 +263,15 @@ function WaveChart({ label, color, values, compact = false, currentTime = false,
 
 function MiniTrend({ values, color = "red" }) {
   return (
-    <svg className={`kgen-mini-trend ${color}`} viewBox="0 0 80 34" preserveAspectRatio="none">
-      <polyline points={toPolylineScaled(values)} />
-    </svg>
+    <div className={`kgen-mini-trend-box ${color}`}>
+      <svg
+        className={`kgen-mini-trend ${color}`}
+        viewBox="0 0 80 34"
+        preserveAspectRatio="none"
+      >
+        <polyline points={toPolylineScaled(values)} />
+      </svg>
+    </div>
   );
 }
 
