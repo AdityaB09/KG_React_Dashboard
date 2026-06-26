@@ -33,7 +33,7 @@ export default function App() {
   const [modal, setModal] = useState(null);
   const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
   const [compactMode, setCompactMode] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [globalSearchQuery, setGlobalSearchQuery] = useState("");
   const [darkMode, setDarkMode] = useState(false);
   const [timelineEvents, setTimelineEvents] = useState([]);
@@ -42,7 +42,7 @@ export default function App() {
   const lastAlertSignatureRef = useRef("");
   const [multiMonitorOpen, setMultiMonitorOpen] = useState(false);
   
-  const [activePage, setActivePage] = useState("dashboard");
+  const [activePage, setActivePage] = useState("physiology"); // "dashboard", "monitor", "physiology" 
   const [monitorPatientIds, setMonitorPatientIds] = useState([]);
   
   const [monitorSlots, setMonitorSlots] = useState([null, null, null, null]);
@@ -366,7 +366,7 @@ function renderActivePage() {
   if (activePage === "monitor") return renderMonitorPage();
   if (activePage === "physiology") return renderPhysiologyPage();
 
-  return renderDashboardPage();
+  return renderPhysiologyPage();
 }
 
   return (

@@ -26,12 +26,19 @@ export default function Navbar({
         </label>
       </div>
 
-     <nav className="nav-links" aria-label="Main navigation">
+    <nav className="nav-links" aria-label="Main navigation">
+  <button
+    className={activePage === "physiology" ? "active" : ""}
+    onClick={() => onPageChange("physiology")}
+  >
+    Dashboard
+  </button>
+
   <button
     className={activePage === "dashboard" ? "active" : ""}
     onClick={() => onPageChange("dashboard")}
   >
-    Dashboard
+    Patient Home
   </button>
 
   <button
@@ -41,20 +48,8 @@ export default function Navbar({
     Multi Monitor
   </button>
 
-  <button
-    className={activePage === "physiology" ? "active" : ""}
-    onClick={() => onPageChange("physiology")}
-  >
-    Physiology
-  </button>
-
-  <button>
-    Team
-  </button>
-
-  <button>
-    Calendar
-  </button>
+  <button>Team</button>
+  <button>Calendar</button>
 </nav>
 
       <div className="nav-profile">
