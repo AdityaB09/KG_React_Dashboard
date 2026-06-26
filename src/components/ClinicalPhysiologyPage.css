@@ -853,3 +853,147 @@ body.dark-mode .kgen-page {
   flex-direction: column;
   justify-content: center;
 }
+
+/* ===== SECOND ROW SPACE FILL FIX FOR 03, 04, 05 ===== */
+
+/* Make all second-row cards behave consistently */
+.kgen-labs-small-panel,
+.kgen-vitals-panel,
+.kgen-med-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 215px;
+}
+
+/* Keep headings fixed at top */
+.kgen-labs-small-panel > h2,
+.kgen-vitals-panel > h2,
+.kgen-med-panel > h2 {
+  flex: 0 0 auto;
+}
+
+/* ---------------- SECOND ROW 03 LAB RESULTS ---------------- */
+
+.kgen-labs-small-panel {
+  justify-content: flex-start;
+}
+
+/* Let the two lab cards stretch vertically instead of leaving space below */
+.kgen-labs-small-panel > .kgen-lab-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.kgen-labs-small-panel .kgen-lab-tile {
+  height: 100%;
+  min-height: 104px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 9px;
+}
+
+.kgen-labs-small-panel .kgen-lab-tile strong {
+  font-size: 30px;
+  margin-top: 6px;
+}
+
+.kgen-labs-small-panel .kgen-lab-bottom {
+  margin-top: auto;
+}
+
+.kgen-labs-small-panel .kgen-blue-btn {
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+/* ---------------- SECOND ROW 04 VITAL SIGNS ---------------- */
+
+.kgen-vitals-panel .kgen-table {
+  flex: 1;
+  height: 100%;
+}
+
+.kgen-vitals-panel .kgen-table thead {
+  height: 42px;
+}
+
+.kgen-vitals-panel .kgen-table tbody tr {
+  height: 44px;
+}
+
+.kgen-vitals-panel .kgen-table th {
+  padding: 8px 9px;
+  vertical-align: middle;
+}
+
+.kgen-vitals-panel .kgen-table td {
+  padding: 10px 9px;
+  vertical-align: middle;
+  font-size: 13.5px;
+}
+
+/* Keep date from wrapping weirdly */
+.kgen-vitals-panel .kgen-table th:nth-child(4),
+.kgen-vitals-panel .kgen-table td:nth-child(4) {
+  white-space: nowrap;
+}
+
+/* ---------------- SECOND ROW 05 MEDICATION ADHERENCE ---------------- */
+
+.kgen-med-panel .kgen-table {
+  flex: 1;
+  height: 100%;
+}
+
+.kgen-med-panel .kgen-table thead {
+  height: 42px;
+}
+
+.kgen-med-panel .kgen-table tbody tr {
+  height: 50px;
+}
+
+.kgen-med-panel .kgen-table th {
+  padding: 8px 9px;
+  vertical-align: middle;
+}
+
+.kgen-med-panel .kgen-table td {
+  padding: 10px 9px;
+  vertical-align: middle;
+  font-size: 13.5px;
+}
+
+/* Make medication name column more readable */
+.kgen-med-panel .kgen-table.meds th:nth-child(1),
+.kgen-med-panel .kgen-table.meds td:nth-child(1) {
+  width: 40%;
+}
+
+/* Give not-taken enough space for icon + time */
+.kgen-med-panel .kgen-table.meds th:nth-child(3),
+.kgen-med-panel .kgen-table.meds td:nth-child(3) {
+  width: 24%;
+  white-space: nowrap;
+}
+
+/* Keep dates in one line */
+.kgen-med-panel .kgen-table.meds th:nth-child(4),
+.kgen-med-panel .kgen-table.meds td:nth-child(4) {
+  width: 20%;
+  white-space: nowrap;
+}
+
+/* Improve icon alignment inside medication table */
+.kgen-med-panel .kgen-ok,
+.kgen-med-panel .kgen-no {
+  margin-right: 4px;
+  vertical-align: middle;
+}
