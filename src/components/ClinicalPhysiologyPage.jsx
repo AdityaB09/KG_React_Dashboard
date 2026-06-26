@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import "./ClinicalPhysiologyPage.css";
 
-const MAX_POINTS = 260;
+const MAX_POINTS = 360;
+const CURRENT_MARK_RATIO = 0.47;
 
 const BASE_PATIENT = {
   name: "Leslie Abbott",
@@ -9,6 +10,15 @@ const BASE_PATIENT = {
   dob: "1946-08-22",
   id: "87675858"
 };
+
+function formatLiveClock(date = new Date()) {
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false
+  }).format(date);
+}
 
 const MEDICATION_ROWS = [
   {
@@ -46,49 +56,75 @@ function appendValues(series, values) {
   return [...series.slice(values.length), ...values];
 }
 
-function ecgValue(i) {
-  const beat = (i * 0.071) % 1;
-  let value = 0.52;
+function buildStrip(factory, tick = 0) {
+  return Array.from({ length: MAX_POINTS }, (_, index) => factory(index, tick));
+}
 
-  if (beat < 0.035) value = 0.52;
-  else if (beat < 0.055) value = 0.72;
-  else if (beat < 0.073) value = 0.12;
-  else if (beat < 0.095) value = 0.92;
-  else if (beat < 0.145) value = 0.42;
-  else if (beat < 0.27) value = 0.55;
-  else value = 0.5 + Math.sin(i * 0.18) * 0.03;
+function ecgValue(index, tick = 0) {
+  const crisisStart = Math.floor(MAX_POINTS * CURRENT_MARK_RATIO);
+  const animatedIndex = index + tick * 1.8;
+  const beat = (animatedIndex * 0.083) % 1;
 
-  const crisisZone = i % MAX_POINTS > 170;
-  if (crisisZone) {
-    value = 0.5 + Math.sin(i * 0.38) * 0.3 + Math.sin(i * 1.1) * 0.07;
+  let value = 0.5 + Math.sin(animatedIndex * 0.035) * 0.015;
+
+  if (index < crisisStart) {
+    if (beat < 0.025) value = 0.5;
+    else if (beat < 0.043) value = 0.62;
+    else if (beat < 0.058) value = 0.25;
+    else if (beat < 0.076) value = 0.91;
+    else if (beat < 0.11) value = 0.43;
+    else if (beat < 0.22) value = 0.52 + Math.sin(beat * Math.PI * 6) * 0.045;
+    else value = 0.5 + Math.sin(animatedIndex * 0.1) * 0.018;
+  } else {
+    const wideBeat = (animatedIndex * 0.038) % 1;
+    value =
+      0.5 +
+      Math.sin(wideBeat * Math.PI * 2) * 0.31 +
+      Math.sin(animatedIndex * 0.24) * 0.055;
   }
 
   return clamp(value, 0.08, 0.95);
 }
 
-function respValue(i) {
-  let value = 0.5 + Math.sin(i * 0.09) * 0.3;
+function redRhythmValue(index, tick = 0) {
+  const crisisStart = Math.floor(MAX_POINTS * CURRENT_MARK_RATIO);
+  const animatedIndex = index + tick * 1.6;
+  const beat = (animatedIndex * 0.085) % 1;
 
-  if (i % MAX_POINTS > 185) {
-    value += Math.sin(i * 0.36) * 0.11;
+  let value = 0.5 + Math.sin(animatedIndex * 0.04) * 0.012;
+
+  if (index < crisisStart) {
+    if (beat < 0.03) value = 0.5;
+    else if (beat < 0.047) value = 0.62;
+    else if (beat < 0.06) value = 0.34;
+    else if (beat < 0.078) value = 0.74;
+    else if (beat < 0.13) value = 0.48;
+  } else {
+    value =
+      0.5 +
+      Math.sin(animatedIndex * 0.18) * 0.18 +
+      Math.sin(animatedIndex * 0.42) * 0.035;
   }
 
-  return clamp(value, 0.1, 0.9);
+  return clamp(value, 0.12, 0.88);
 }
 
-function ppgValue(i, soft = false) {
-  const beat = (i * 0.059) % 1;
+function ppgValue(index, tick = 0, soft = false) {
+  const crisisStart = Math.floor(MAX_POINTS * CURRENT_MARK_RATIO);
+  const animatedIndex = index + tick * 1.4;
+  const beat = (animatedIndex * 0.058) % 1;
+
   let pulse =
-    beat < 0.12
-      ? Math.sin((beat / 0.12) * Math.PI) * 0.62
-      : Math.exp(-beat * 5) * 0.25;
+    beat < 0.11
+      ? Math.sin((beat / 0.11) * Math.PI) * 0.58
+      : Math.exp(-beat * 4.8) * 0.23;
 
   if (soft) pulse *= 0.62;
 
-  let value = 0.77 - pulse + Math.sin(i * 0.12) * 0.025;
+  let value = 0.34 + pulse + Math.sin(animatedIndex * 0.055) * 0.018;
 
-  if (i % MAX_POINTS > 190) {
-    value += Math.sin(i * 0.45) * 0.08;
+  if (index > crisisStart) {
+    value += Math.sin(animatedIndex * 0.35) * 0.045;
   }
 
   return clamp(value, 0.08, 0.94);
@@ -101,6 +137,7 @@ function buildSeries(factory) {
 function createInitialLiveState() {
   return {
     tick: 0,
+    clockText: formatLiveClock(),
     heartRate: 160,
     respiratoryRate: 35,
     spo2: 99,
@@ -111,10 +148,10 @@ function createInitialLiveState() {
     potassium: 5.4,
     creatinine: 1.42,
     wbc: 12.1,
-    ecg: buildSeries(ecgValue),
-    resp: buildSeries(respValue),
-    ppg: buildSeries((i) => ppgValue(i, false)),
-    ppgSoft: buildSeries((i) => ppgValue(i, true)),
+    ecg: buildStrip(ecgValue, 0),
+    resp: buildStrip(redRhythmValue, 0),
+    ppg: buildStrip((index, tick) => ppgValue(index, tick, false), 0),
+    ppgSoft: buildStrip((index, tick) => ppgValue(index, tick, true), 0),
     heartTrend: [122, 130, 139, 148, 160],
     respTrend: [18, 21, 24, 29, 35],
     spo2Trend: [97, 98, 97, 99, 99],
@@ -149,30 +186,31 @@ function nextLiveState(prev) {
   const wbc = Number(clamp(12.1 + Math.sin(tick / 7) * 0.5, 11.4, 12.9).toFixed(1));
 
   return {
-    ...prev,
-    tick,
-    heartRate,
-    respiratoryRate,
-    spo2,
-    systolic,
-    diastolic,
-    temperature,
-    glucose,
-    potassium,
-    creatinine,
-    wbc,
-    ecg: appendValues(prev.ecg, nextIndexes.map(ecgValue)),
-    resp: appendValues(prev.resp, nextIndexes.map(respValue)),
-    ppg: appendValues(prev.ppg, nextIndexes.map((i) => ppgValue(i, false))),
-    ppgSoft: appendValues(prev.ppgSoft, nextIndexes.map((i) => ppgValue(i, true))),
-    heartTrend: appendValues(prev.heartTrend, [heartRate]).slice(-8),
-    respTrend: appendValues(prev.respTrend, [respiratoryRate]).slice(-8),
-    spo2Trend: appendValues(prev.spo2Trend, [spo2]).slice(-8),
-    glucoseTrend: appendValues(prev.glucoseTrend, [glucose]).slice(-8),
-    potassiumTrend: appendValues(prev.potassiumTrend, [potassium]).slice(-8),
-    creatinineTrend: appendValues(prev.creatinineTrend, [creatinine]).slice(-8),
-    wbcTrend: appendValues(prev.wbcTrend, [wbc]).slice(-8)
-  };
+  ...prev,
+  tick,
+  clockText: formatLiveClock(),
+  heartRate,
+  respiratoryRate,
+  spo2,
+  systolic,
+  diastolic,
+  temperature,
+  glucose,
+  potassium,
+  creatinine,
+  wbc,
+  ecg: buildStrip(ecgValue, tick),
+  resp: buildStrip(redRhythmValue, tick),
+  ppg: buildStrip((index, currentTick) => ppgValue(index, currentTick, false), tick),
+  ppgSoft: buildStrip((index, currentTick) => ppgValue(index, currentTick, true), tick),
+  heartTrend: appendValues(prev.heartTrend, [heartRate]).slice(-8),
+  respTrend: appendValues(prev.respTrend, [respiratoryRate]).slice(-8),
+  spo2Trend: appendValues(prev.spo2Trend, [spo2]).slice(-8),
+  glucoseTrend: appendValues(prev.glucoseTrend, [glucose]).slice(-8),
+  potassiumTrend: appendValues(prev.potassiumTrend, [potassium]).slice(-8),
+  creatinineTrend: appendValues(prev.creatinineTrend, [creatinine]).slice(-8),
+  wbcTrend: appendValues(prev.wbcTrend, [wbc]).slice(-8)
+};
 }
 
 function toPolylineNormalized(values, width, height, padding = 6) {
@@ -199,14 +237,22 @@ function toPolylineScaled(values, width = 80, height = 34, padding = 4) {
     .join(" ");
 }
 
-function WaveChart({ label, color, values, compact = false, currentTime = false }) {
+function WaveChart({ label, color, values, compact = false, currentTime = false, clockText }) {
   const width = 620;
   const height = compact ? 42 : 66;
 
   return (
     <div className={`kgen-wave-card ${compact ? "compact" : ""} ${color}`}>
       {label && <span className={`kgen-wave-label ${color}`}>{label}</span>}
-      {currentTime && <span className="kgen-current-time">Current time: 10.50</span>}
+
+      {currentTime && (
+        <>
+          <span className="kgen-current-marker" />
+          <span className="kgen-current-time">
+            Current time: {clockText || formatLiveClock()}
+          </span>
+        </>
+      )}
 
       <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
         <polyline points={toPolylineNormalized(values, width, height)} />
@@ -224,24 +270,30 @@ function MiniTrend({ values, color = "red" }) {
 }
 
 function LabTile({ name, value, status, meta, trend }) {
+  const [firstDate, secondDate] = String(meta).split(" ");
+
   return (
     <article className="kgen-lab-tile">
       <div className="kgen-lab-title">
         <span>{name}</span>
-        <button type="button">›</button>
+        <button type="button" aria-label={`Open ${name} lab trend`}>
+          ›
+        </button>
       </div>
 
-      <strong>{value}</strong>
-
-      <div className="kgen-lab-bottom">
-        <small>{status}</small>
+      <div className="kgen-lab-value-row">
+        <strong>{value}</strong>
         <MiniTrend values={trend} />
-        <em>{meta}</em>
+      </div>
+
+      <div className="kgen-lab-meta-line">
+        <small>{status}</small>
+        <em>{firstDate}</em>
+        {secondDate && <em>{secondDate}</em>}
       </div>
     </article>
   );
 }
-
 export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
   const [live, setLive] = useState(createInitialLiveState);
 
@@ -324,13 +376,22 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
       <main className="kgen-grid">
         <section className="kgen-panel kgen-live-panel">
           <div className="kgen-panel-title-row">
-            <h2>01. Live Physiology</h2>
-            <span className="kgen-live-pill">● Live dummy stream</span>
-          </div>
+  <h2>01. Live Physiology</h2>
+
+  <span className="kgen-header-clock">
+    <span className="kgen-clock-dot" />
+    <span>Current time: {live.clockText || formatLiveClock()}</span>
+  </span>
+</div>
 
           <div className="kgen-live-content">
             <div className="kgen-wave-stack">
-              <WaveChart label="ECG (RED)" color="red" values={live.ecg} currentTime />
+              <WaveChart
+  label="ECG (RED)"
+  color="red"
+  values={live.ecg}
+  
+/>
               <WaveChart color="red" values={live.resp} compact />
               <WaveChart label="PPG (BLUE)" color="blue" values={live.ppg} />
               <WaveChart color="blue" values={live.ppgSoft} compact />
