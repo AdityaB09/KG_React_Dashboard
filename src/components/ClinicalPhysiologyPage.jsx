@@ -327,28 +327,28 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
       name: "Glucose",
       value: live.glucose,
       status: "High/Critical",
-      meta: "00/23 07/18",
+      meta: "",
       trend: live.glucoseTrend
     },
     {
       name: "Potassium",
       value: live.potassium.toFixed(1),
       status: "High/Critical",
-      meta: "96/33 07/18",
+      meta: "",
       trend: live.potassiumTrend
     },
     {
       name: "Creatinine",
       value: live.creatinine.toFixed(2),
       status: "High/Critical",
-      meta: "00/23 07/18",
+      meta: "",
       trend: live.creatinineTrend
     },
     {
       name: "WBC",
       value: live.wbc.toFixed(1),
       status: "High",
-      meta: "06/33 07/18",
+      meta: "",
       trend: live.wbcTrend
     }
   ];
