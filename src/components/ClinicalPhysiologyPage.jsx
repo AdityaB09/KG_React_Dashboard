@@ -237,12 +237,29 @@ function toPolylineScaled(values, width = 80, height = 34, padding = 4) {
     .join(" ");
 }
 
-function WaveChart({ label, color, values, compact = false, currentTime = false, clockText }) {
+function WaveChart({
+  label,
+  color,
+  values,
+  compact = false,
+  currentTime = false,
+  clockText,
+  onOpen,
+  ariaLabel
+}) {
   const width = 620;
   const height = compact ? 42 : 66;
+  const ChartTag = onOpen ? "button" : "div";
 
   return (
-    <div className={`kgen-wave-card ${compact ? "compact" : ""} ${color}`}>
+    <ChartTag
+      type={onOpen ? "button" : undefined}
+      className={`kgen-wave-card ${compact ? "compact" : ""} ${color} ${
+        onOpen ? "kgen-clickable-wave" : ""
+      }`}
+      onClick={onOpen}
+      aria-label={ariaLabel}
+    >
       {label && <span className={`kgen-wave-label ${color}`}>{label}</span>}
 
       {currentTime && (
@@ -257,13 +274,24 @@ function WaveChart({ label, color, values, compact = false, currentTime = false,
       <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
         <polyline points={toPolylineNormalized(values, width, height)} />
       </svg>
-    </div>
+
+      {onOpen && <span className="kgen-open-wave-hint">↗</span>}
+    </ChartTag>
   );
 }
 
-function MiniTrend({ values, color = "red" }) {
+function MiniTrend({ values, color = "red", onOpen, ariaLabel }) {
+  const TrendTag = onOpen ? "button" : "div";
+
   return (
-    <div className={`kgen-mini-trend-box ${color}`}>
+    <TrendTag
+      type={onOpen ? "button" : undefined}
+      className={`kgen-mini-trend-box ${color} ${
+        onOpen ? "kgen-clickable-trend" : ""
+      }`}
+      onClick={onOpen}
+      aria-label={ariaLabel}
+    >
       <svg
         className={`kgen-mini-trend ${color}`}
         viewBox="0 0 80 34"
@@ -271,25 +299,35 @@ function MiniTrend({ values, color = "red" }) {
       >
         <polyline points={toPolylineScaled(values)} />
       </svg>
-    </div>
+
+      {onOpen && <span className="kgen-mini-open-dot">↗</span>}
+    </TrendTag>
   );
 }
 
-function LabTile({ name, value, status, meta, trend }) {
+function LabTile({ name, value, status, meta, trend, onOpenTrend }) {
   const [firstDate, secondDate] = String(meta).split(" ");
 
   return (
     <article className="kgen-lab-tile">
       <div className="kgen-lab-title">
         <span>{name}</span>
-        <button type="button" aria-label={`Open ${name} lab trend`}>
+        <button
+          type="button"
+          aria-label={`Open ${name} lab trend`}
+          onClick={onOpenTrend}
+        >
           ›
         </button>
       </div>
 
       <div className="kgen-lab-value-row">
         <strong>{value}</strong>
-        <MiniTrend values={trend} />
+        <MiniTrend
+          values={trend}
+          onOpen={onOpenTrend}
+          ariaLabel={`Open ${name} trend popup`}
+        />
       </div>
 
       <div className="kgen-lab-meta-line">
@@ -300,8 +338,109 @@ function LabTile({ name, value, status, meta, trend }) {
     </article>
   );
 }
+
+function WaveformOverlay({ config, onClose }) {
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.key === "Escape") onClose();
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.classList.add("kgen-wave-modal-open");
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.classList.remove("kgen-wave-modal-open");
+    };
+  }, [onClose]);
+
+  if (!config) return null;
+
+  const width = 980;
+  const height = 340;
+
+  const points =
+    config.scaleMode === "scaled"
+      ? toPolylineScaled(config.values, width, height, 24)
+      : toPolylineNormalized(config.values, width, height, 24);
+
+  const minValue = Math.min(...config.values);
+  const maxValue = Math.max(...config.values);
+  const latestValue = config.values[config.values.length - 1];
+
+  return (
+    <div className="kgen-wave-overlay-backdrop" onMouseDown={onClose}>
+      <section
+        className="kgen-wave-overlay-card"
+        onMouseDown={(event) => event.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={config.title}
+      >
+        <header className="kgen-wave-overlay-header">
+          <div>
+            <p>{config.section}</p>
+            <h2>{config.title}</h2>
+            <span>{config.subtitle}</span>
+          </div>
+
+          <button
+            type="button"
+            className="kgen-wave-overlay-close"
+            onClick={onClose}
+            aria-label="Close waveform popup"
+          >
+            ×
+          </button>
+        </header>
+
+        <div className="kgen-wave-overlay-stats">
+          <div>
+            <span>Current</span>
+            <strong>
+              {config.currentValue}
+              {config.unit}
+            </strong>
+          </div>
+
+          <div>
+            <span>Status</span>
+            <strong>{config.status}</strong>
+          </div>
+
+          <div>
+            <span>Min</span>
+            <strong>
+              {config.scaleMode === "scaled" ? minValue.toFixed(config.decimals ?? 0) : "Live"}
+            </strong>
+          </div>
+
+          <div>
+            <span>Max</span>
+            <strong>
+              {config.scaleMode === "scaled" ? maxValue.toFixed(config.decimals ?? 0) : "Live"}
+            </strong>
+          </div>
+        </div>
+
+        <div className={`kgen-wave-overlay-chart ${config.color}`}>
+          <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+            <polyline points={points} />
+          </svg>
+        </div>
+
+        <footer className="kgen-wave-overlay-footer">
+          <span>{config.footerLeft}</span>
+          <span>{config.footerRight}</span>
+        </footer>
+      </section>
+    </div>
+  );
+}
+
 export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
   const [live, setLive] = useState(createInitialLiveState);
+  const [activeWaveformId, setActiveWaveformId] = useState(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -322,42 +461,187 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
     };
   }, [patient]);
 
-  const labCards = [
-    {
-      name: "Glucose",
-      value: live.glucose,
-      status: "High/Critical",
-      meta: "",
-      trend: live.glucoseTrend
-    },
-    {
-      name: "Potassium",
-      value: live.potassium.toFixed(1),
-      status: "High/Critical",
-      meta: "",
-      trend: live.potassiumTrend
-    },
-    {
-      name: "Creatinine",
-      value: live.creatinine.toFixed(2),
-      status: "High/Critical",
-      meta: "",
-      trend: live.creatinineTrend
-    },
-    {
-      name: "WBC",
-      value: live.wbc.toFixed(1),
-      status: "High",
-      meta: "",
-      trend: live.wbcTrend
-    }
-  ];
+  const labCards = useMemo(
+    () => [
+      {
+        name: "Glucose",
+        value: live.glucose,
+        status: "High/Critical",
+        meta: "",
+        trend: live.glucoseTrend
+      },
+      {
+        name: "Potassium",
+        value: live.potassium.toFixed(1),
+        status: "High/Critical",
+        meta: "",
+        trend: live.potassiumTrend
+      },
+      {
+        name: "Creatinine",
+        value: live.creatinine.toFixed(2),
+        status: "High/Critical",
+        meta: "",
+        trend: live.creatinineTrend
+      },
+      {
+        name: "WBC",
+        value: live.wbc.toFixed(1),
+        status: "High",
+        meta: "",
+        trend: live.wbcTrend
+      }
+    ],
+    [
+      live.glucose,
+      live.potassium,
+      live.creatinine,
+      live.wbc,
+      live.glucoseTrend,
+      live.potassiumTrend,
+      live.creatinineTrend,
+      live.wbcTrend
+    ]
+  );
 
   const vitalRows = [
     ["BP", `${live.systolic}/${live.diastolic}`, "mmHg", "07/16/25"],
     ["SpO2", live.spo2, "%", "07/16/25"],
     ["Oral Temperature", live.temperature.toFixed(1), "°C", "07/10/25"]
   ];
+
+  const waveformOverlay = useMemo(() => {
+    if (!activeWaveformId) return null;
+
+    const liveWaveforms = {
+      ecg: {
+        section: "01. Live Physiology",
+        title: "ECG waveform",
+        subtitle: `${currentPatient.name} • Hyperkalemic rhythm progression`,
+        color: "red",
+        scaleMode: "normalized",
+        values: live.ecg,
+        currentValue: live.heartRate,
+        unit: " bpm",
+        status: "Critical",
+        footerLeft: "0s",
+        footerRight: "16s"
+      },
+      resp: {
+        section: "01. Live Physiology",
+        title: "Respiratory rhythm waveform",
+        subtitle: `${currentPatient.name} • Respiratory waveform strip`,
+        color: "red",
+        scaleMode: "normalized",
+        values: live.resp,
+        currentValue: live.respiratoryRate,
+        unit: " rpm",
+        status: "Warning",
+        footerLeft: "0s",
+        footerRight: "16s"
+      },
+      ppg: {
+        section: "01. Live Physiology",
+        title: "PPG waveform",
+        subtitle: `${currentPatient.name} • Pulse plethysmography signal`,
+        color: "blue",
+        scaleMode: "normalized",
+        values: live.ppg,
+        currentValue: live.spo2,
+        unit: "%",
+        status: "Monitored",
+        footerLeft: "0s",
+        footerRight: "16s"
+      },
+      ppgSoft: {
+        section: "01. Live Physiology",
+        title: "Secondary PPG waveform",
+        subtitle: `${currentPatient.name} • Low amplitude pulse trend`,
+        color: "blue",
+        scaleMode: "normalized",
+        values: live.ppgSoft,
+        currentValue: live.spo2,
+        unit: "%",
+        status: "Monitored",
+        footerLeft: "0s",
+        footerRight: "16s"
+      },
+      heartTrend: {
+        section: "01. Live Physiology",
+        title: "Heart rate trend",
+        subtitle: `${currentPatient.name} • Live heart rate mini trend`,
+        color: "red",
+        scaleMode: "scaled",
+        values: live.heartTrend,
+        currentValue: live.heartRate,
+        unit: " bpm",
+        status: "Critical",
+        decimals: 0,
+        footerLeft: "Earlier",
+        footerRight: "Now"
+      },
+      respTrend: {
+        section: "01. Live Physiology",
+        title: "Respiratory rate trend",
+        subtitle: `${currentPatient.name} • Live respiratory trend`,
+        color: "blue",
+        scaleMode: "scaled",
+        values: live.respTrend,
+        currentValue: live.respiratoryRate,
+        unit: " rpm",
+        status: "Warning",
+        decimals: 0,
+        footerLeft: "Earlier",
+        footerRight: "Now"
+      },
+      spo2Trend: {
+        section: "01. Live Physiology",
+        title: "SpO2 trend",
+        subtitle: `${currentPatient.name} • Oxygen saturation trend`,
+        color: "blue",
+        scaleMode: "scaled",
+        values: live.spo2Trend,
+        currentValue: live.spo2,
+        unit: "%",
+        status: "Stable",
+        decimals: 0,
+        footerLeft: "Earlier",
+        footerRight: "Now"
+      }
+    };
+
+    if (liveWaveforms[activeWaveformId]) {
+      return liveWaveforms[activeWaveformId];
+    }
+
+    const labName = activeWaveformId.replace("lab-", "");
+    const selectedLab = labCards.find((item) => item.name === labName);
+
+    if (!selectedLab) return null;
+
+    return {
+      section: "03. Recent Lab Results & Trends",
+      title: `${selectedLab.name} trend`,
+      subtitle: `${currentPatient.name} • Lab trend over recent draws`,
+      color: "red",
+      scaleMode: "scaled",
+      values: selectedLab.trend,
+      currentValue: selectedLab.value,
+      unit: "",
+      status: selectedLab.status,
+      decimals:
+        selectedLab.name === "Creatinine"
+          ? 2
+          : selectedLab.name === "Potassium"
+          ? 1
+          : selectedLab.name === "WBC"
+          ? 1
+          : 0,
+      footerLeft: "06/23",
+      footerRight: "07/18"
+    };
+  }, [activeWaveformId, currentPatient.name, live, labCards]);
+
 
   return (
     <section className="kgen-page">
@@ -396,11 +680,33 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
   label="ECG (RED)"
   color="red"
   values={live.ecg}
-  
+  onOpen={() => setActiveWaveformId("ecg")}
+  ariaLabel="Open ECG waveform popup"
 />
-              <WaveChart color="red" values={live.resp} compact />
-              <WaveChart label="PPG (BLUE)" color="blue" values={live.ppg} />
-              <WaveChart color="blue" values={live.ppgSoft} compact />
+
+<WaveChart
+  color="red"
+  values={live.resp}
+  compact
+  onOpen={() => setActiveWaveformId("resp")}
+  ariaLabel="Open respiratory waveform popup"
+/>
+
+<WaveChart
+  label="PPG (BLUE)"
+  color="blue"
+  values={live.ppg}
+  onOpen={() => setActiveWaveformId("ppg")}
+  ariaLabel="Open PPG waveform popup"
+/>
+
+<WaveChart
+  color="blue"
+  values={live.ppgSoft}
+  compact
+  onOpen={() => setActiveWaveformId("ppgSoft")}
+  ariaLabel="Open secondary PPG waveform popup"
+/>
 
               <div className="kgen-time-axis">
                 <span>0 mo</span>
@@ -416,19 +722,33 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
               <div className="kgen-side-vital">
                 <span>Heart Rate</span>
                 <strong>{live.heartRate}</strong>
-                <MiniTrend values={live.heartTrend} />
+              <MiniTrend
+  values={live.heartTrend}
+  onOpen={() => setActiveWaveformId("heartTrend")}
+  ariaLabel="Open heart rate trend popup"
+/>
               </div>
 
               <div className="kgen-side-vital">
                 <span>Respiratory Rate</span>
                 <strong className="blue">{live.respiratoryRate}</strong>
-                <MiniTrend color="blue" values={live.respTrend} />
+         <MiniTrend
+  color="blue"
+  values={live.respTrend}
+  onOpen={() => setActiveWaveformId("respTrend")}
+  ariaLabel="Open respiratory rate trend popup"
+/>
               </div>
 
               <div className="kgen-side-vital">
                 <span>SpO2</span>
                 <strong className="blue">{live.spo2}%</strong>
-                <MiniTrend color="blue" values={live.spo2Trend} />
+                <MiniTrend
+  color="blue"
+  values={live.spo2Trend}
+  onOpen={() => setActiveWaveformId("spo2Trend")}
+  ariaLabel="Open SpO2 trend popup"
+/>
               </div>
             </aside>
           </div>
@@ -438,9 +758,13 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
           <h2>03. Recent Lab Results &amp; Trends</h2>
 
           <div className="kgen-lab-grid">
-            {labCards.map((item) => (
-              <LabTile key={item.name} {...item} />
-            ))}
+           {labCards.map((item) => (
+  <LabTile
+    key={item.name}
+    {...item}
+    onOpenTrend={() => setActiveWaveformId(`lab-${item.name}`)}
+  />
+))}
           </div>
 
           <div className="kgen-mini-table">
@@ -496,9 +820,13 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
           <h2>03. Recent Lab Results &amp; Trends</h2>
 
           <div className="kgen-lab-grid small">
-            {labCards.slice(0, 2).map((item) => (
-              <LabTile key={item.name} {...item} />
-            ))}
+          {labCards.slice(0, 2).map((item) => (
+  <LabTile
+    key={item.name}
+    {...item}
+    onOpenTrend={() => setActiveWaveformId(`lab-${item.name}`)}
+  />
+))}
           </div>
 
           <button className="kgen-blue-btn" type="button" onClick={onOpenLabs}>
@@ -584,6 +912,12 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
 
         <strong>KardioGenics</strong>
       </footer>
+      {waveformOverlay && (
+  <WaveformOverlay
+    config={waveformOverlay}
+    onClose={() => setActiveWaveformId(null)}
+  />
+)}
     </section>
   );
 }

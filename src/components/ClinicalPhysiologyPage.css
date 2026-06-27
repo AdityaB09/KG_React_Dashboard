@@ -1625,3 +1625,1460 @@ body.dark-mode .kgen-page {
     rgba(255, 255, 255, 0) 100%
   );
 }
+
+/* =========================================================
+   SIDEBAR-OPEN ACCOMMODATING PHYSIOLOGY LAYOUT
+   Keeps the KardioGenics dashboard legible when sidebar opens
+========================================================= */
+
+.dashboard-main:has(.kgen-page) {
+  container-type: inline-size;
+  container-name: kgen-main;
+  padding: 10px 14px 18px;
+  overflow-x: hidden;
+}
+
+.dashboard-main:has(.kgen-page) .kgen-page {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+
+/* When sidebar is open, stop the page from feeling squeezed */
+.workspace:not(.sidebar-collapsed) .dashboard-main:has(.kgen-page) {
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+/* Keep top header readable with sidebar open */
+.workspace:not(.sidebar-collapsed) .kgen-topbar {
+  grid-template-columns:
+    minmax(180px, 230px)
+    minmax(270px, 360px)
+    minmax(430px, 1fr);
+  gap: 10px;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-brand-box,
+.workspace:not(.sidebar-collapsed) .kgen-patient-box,
+.workspace:not(.sidebar-collapsed) .kgen-title-box {
+  min-height: 55px;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-brand-box span {
+  font-size: clamp(17px, 1.35vw, 21px);
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-patient-box strong {
+  font-size: clamp(21px, 1.75vw, 27px);
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-title-box {
+  font-size: clamp(16px, 1.35vw, 21px);
+  padding-inline: 18px;
+}
+
+/* Slightly tighter but still readable first row */
+.workspace:not(.sidebar-collapsed) .kgen-grid {
+  gap: 12px;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-panel {
+  padding: 10px 12px;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel {
+  min-height: 362px;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-live-content {
+  grid-template-columns: minmax(0, 1fr) 126px;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-labs-panel > h2,
+.workspace:not(.sidebar-collapsed) .kgen-alert-panel > h2 {
+  font-size: clamp(14px, 1.05vw, 16px);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-alert-panel .kgen-alert-box p {
+  font-size: clamp(9.4px, 0.78vw, 10.3px);
+  line-height: 1.18;
+}
+
+/* If the available dashboard space gets too narrow, reflow instead of crushing */
+@container kgen-main (max-width: 1180px) {
+  .kgen-topbar {
+    grid-template-columns: minmax(180px, 0.7fr) minmax(260px, 1fr);
+  }
+
+  .kgen-title-box {
+    grid-column: 1 / -1;
+  }
+
+  .kgen-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .kgen-live-panel {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .kgen-labs-panel {
+    grid-column: 1 / span 5;
+    grid-row: 2;
+  }
+
+  .kgen-alert-panel {
+    grid-column: 6 / span 7;
+    grid-row: 2;
+  }
+
+  .kgen-labs-small-panel {
+    grid-column: 1 / span 4;
+    grid-row: 3;
+  }
+
+  .kgen-vitals-panel {
+    grid-column: 5 / span 4;
+    grid-row: 3;
+  }
+
+  .kgen-med-panel {
+    grid-column: 9 / span 4;
+    grid-row: 3;
+  }
+
+  .kgen-live-panel .kgen-wave-stack {
+    grid-template-rows: 1.05fr 0.48fr 1.05fr 0.48fr 18px;
+  }
+
+  .kgen-alert-panel .kgen-alert-box {
+    min-height: 100%;
+  }
+}
+
+@container kgen-main (max-width: 920px) {
+  .kgen-topbar,
+  .kgen-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kgen-brand-box,
+  .kgen-patient-box,
+  .kgen-title-box,
+  .kgen-live-panel,
+  .kgen-labs-panel,
+  .kgen-alert-panel,
+  .kgen-labs-small-panel,
+  .kgen-vitals-panel,
+  .kgen-med-panel {
+    grid-column: 1 / -1;
+  }
+
+  .kgen-live-content {
+    grid-template-columns: 1fr;
+  }
+
+  .kgen-side-vitals {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: none;
+  }
+}
+
+/* =========================================================
+   CLICKABLE WAVEFORM / MINI TREND STATES
+========================================================= */
+
+.kgen-wave-card {
+  appearance: none;
+  border: 1px solid #cbd4df;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+}
+
+.kgen-clickable-wave,
+.kgen-clickable-trend {
+  cursor: zoom-in;
+}
+
+.kgen-clickable-wave:hover,
+.kgen-clickable-trend:hover {
+  outline: 2px solid rgba(37, 99, 235, 0.28);
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.kgen-clickable-wave:focus-visible,
+.kgen-clickable-trend:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.5);
+  outline-offset: 2px;
+}
+
+.kgen-open-wave-hint {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  z-index: 5;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.86);
+  color: #0f172a;
+  font-size: 11px;
+  font-weight: 950;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.kgen-clickable-wave:hover .kgen-open-wave-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.kgen-mini-open-dot {
+  position: absolute;
+  right: 4px;
+  top: 3px;
+  z-index: 3;
+  color: #0f172a;
+  font-size: 9px;
+  font-weight: 950;
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.kgen-clickable-trend:hover .kgen-mini-open-dot {
+  opacity: 0.85;
+}
+
+/* =========================================================
+   BIG WAVEFORM POPUP
+========================================================= */
+
+body.kgen-wave-modal-open {
+  overflow: hidden;
+}
+
+.kgen-wave-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: rgba(2, 10, 18, 0.58);
+  backdrop-filter: blur(8px);
+}
+
+.kgen-wave-overlay-card {
+  width: min(1100px, calc(100vw - 56px));
+  max-height: calc(100vh - 56px);
+  overflow: hidden;
+  background: #f8fafc;
+  border: 2px solid #c5ccd4;
+  border-radius: 18px;
+  box-shadow: 0 30px 90px rgba(2, 10, 18, 0.38);
+  display: flex;
+  flex-direction: column;
+}
+
+.kgen-wave-overlay-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px;
+  background: #061927;
+  color: #ffffff;
+  border-bottom: 3px solid #17394c;
+}
+
+.kgen-wave-overlay-header p {
+  margin: 0 0 4px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.kgen-wave-overlay-header h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(24px, 3vw, 36px);
+  line-height: 1;
+  font-weight: 950;
+}
+
+.kgen-wave-overlay-header span {
+  display: block;
+  margin-top: 7px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.kgen-wave-overlay-close {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.kgen-wave-overlay-close:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.kgen-wave-overlay-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #d7dee7;
+  background: #ffffff;
+}
+
+.kgen-wave-overlay-stats div {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #d7dee7;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.kgen-wave-overlay-stats span {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.kgen-wave-overlay-stats strong {
+  display: block;
+  margin-top: 5px;
+  color: #991b1b;
+  font-size: clamp(20px, 2.5vw, 30px);
+  line-height: 1;
+  font-weight: 950;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kgen-wave-overlay-chart {
+  margin: 18px 20px 10px;
+  height: min(42vh, 360px);
+  min-height: 260px;
+  border: 1px solid #cbd4df;
+  border-radius: 14px;
+  overflow: hidden;
+  background:
+    linear-gradient(#dfe7f0 1px, transparent 1px),
+    linear-gradient(90deg, #dfe7f0 1px, transparent 1px),
+    #ffffff;
+  background-size: 42px 42px;
+}
+
+.kgen-wave-overlay-chart svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.kgen-wave-overlay-chart polyline {
+  fill: none;
+  stroke: #bb1e22;
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  filter:
+    drop-shadow(0 0 3px rgba(187, 30, 34, 0.28))
+    drop-shadow(0 0 8px rgba(187, 30, 34, 0.16));
+}
+
+.kgen-wave-overlay-chart.blue polyline {
+  stroke: #4d92a8;
+  filter:
+    drop-shadow(0 0 3px rgba(77, 146, 168, 0.28))
+    drop-shadow(0 0 8px rgba(77, 146, 168, 0.16));
+}
+
+.kgen-wave-overlay-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 0 22px 18px;
+  color: #050b14;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+@media (max-width: 720px) {
+  .kgen-wave-overlay-backdrop {
+    padding: 14px;
+  }
+
+  .kgen-wave-overlay-card {
+    width: calc(100vw - 28px);
+    max-height: calc(100vh - 28px);
+  }
+
+  .kgen-wave-overlay-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kgen-wave-overlay-chart {
+    min-height: 220px;
+    margin-inline: 14px;
+  }
+}
+
+/* =========================================================
+   FINAL FIX: SIDEBAR OPEN SHOULD STAY DESKTOP-LIKE
+   Add this at the VERY BOTTOM of ClinicalPhysiologyPage.css
+========================================================= */
+
+/* The sidebar is open, but the dashboard should not become mobile stacked */
+.workspace:not(.sidebar-collapsed) .dashboard-main:has(.kgen-page) {
+  padding: 10px 20px 18px !important;
+  overflow-x: hidden !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-page {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+/* Keep the top header in 3 columns, not 3 stacked rows */
+.workspace:not(.sidebar-collapsed) .kgen-topbar {
+  display: grid !important;
+  grid-template-columns:
+    minmax(210px, 250px)
+    minmax(320px, 390px)
+    minmax(420px, 1fr) !important;
+  gap: 12px !important;
+  align-items: stretch !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-brand-box,
+.workspace:not(.sidebar-collapsed) .kgen-patient-box,
+.workspace:not(.sidebar-collapsed) .kgen-title-box {
+  grid-column: auto !important;
+  min-height: 58px !important;
+  min-width: 0 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-brand-box {
+  padding-inline: 18px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-brand-box span {
+  font-size: clamp(18px, 1.3vw, 22px) !important;
+  white-space: nowrap !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-patient-box strong {
+  font-size: clamp(22px, 1.8vw, 28px) !important;
+  white-space: nowrap !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-patient-box span {
+  white-space: nowrap !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-title-box {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  line-height: 1 !important;
+  padding-inline: 20px !important;
+  font-size: clamp(16px, 1.35vw, 22px) !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-title-box span {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+}
+
+/* Keep the actual dashboard in the reference-style 12-column layout */
+.workspace:not(.sidebar-collapsed) .kgen-grid {
+  display: grid !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+  grid-auto-rows: auto !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+}
+
+/* Top row */
+.workspace:not(.sidebar-collapsed) .kgen-live-panel {
+  grid-column: 1 / span 6 !important;
+  grid-row: 1 !important;
+  min-height: 355px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-labs-panel {
+  grid-column: 7 / span 3 !important;
+  grid-row: 1 !important;
+  min-height: 355px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-alert-panel {
+  grid-column: 10 / span 3 !important;
+  grid-row: 1 !important;
+  min-height: 355px !important;
+}
+
+/* Bottom row */
+.workspace:not(.sidebar-collapsed) .kgen-labs-small-panel {
+  grid-column: 1 / span 3 !important;
+  grid-row: 2 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-vitals-panel {
+  grid-column: 4 / span 4 !important;
+  grid-row: 2 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-med-panel {
+  grid-column: 8 / span 5 !important;
+  grid-row: 2 !important;
+}
+
+/* Keep 01 compact and readable when sidebar is open */
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-live-content {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 118px !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-wave-stack {
+  display: grid !important;
+  grid-template-rows: 1.08fr 0.5fr 1.08fr 0.5fr 18px !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-wave-card {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-side-vitals {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  min-width: 0 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-side-vital {
+  min-height: 0 !important;
+  padding: 7px 7px 5px 9px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-side-vital span {
+  font-size: 10px !important;
+  line-height: 1.05 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-side-vital strong {
+  font-size: 24px !important;
+}
+
+/* Keep 03 lab panel clean instead of cramped */
+.workspace:not(.sidebar-collapsed) .kgen-labs-panel > h2,
+.workspace:not(.sidebar-collapsed) .kgen-alert-panel > h2 {
+  font-size: clamp(14px, 1vw, 16px) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-labs-panel > .kgen-lab-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(2, minmax(82px, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-labs-panel .kgen-lab-tile {
+  min-height: 82px !important;
+  padding: 8px 9px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-labs-panel .kgen-lab-value-row strong {
+  font-size: 27px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-labs-panel .kgen-mini-table span,
+.workspace:not(.sidebar-collapsed) .kgen-labs-panel .kgen-mini-table b {
+  font-size: 10px !important;
+  min-height: 19px !important;
+}
+
+/* Keep 02 readable but not oversized */
+.workspace:not(.sidebar-collapsed) .kgen-alert-panel .kgen-alert-box {
+  padding: 12px 14px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-alert-panel .kgen-alert-icon {
+  width: 46px !important;
+  height: 46px !important;
+  font-size: 32px !important;
+  margin-bottom: 10px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-alert-panel .kgen-alert-box h3 {
+  font-size: 15.5px !important;
+  line-height: 1.12 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-alert-panel .kgen-alert-box p {
+  font-size: 9.8px !important;
+  line-height: 1.18 !important;
+  margin: 7px 0 !important;
+}
+
+/* Keep lower row matching your reference */
+.workspace:not(.sidebar-collapsed) .kgen-labs-small-panel,
+.workspace:not(.sidebar-collapsed) .kgen-vitals-panel,
+.workspace:not(.sidebar-collapsed) .kgen-med-panel {
+  min-height: 215px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-table th {
+  font-size: 10.5px !important;
+  padding: 8px 9px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-table td {
+  font-size: 13px !important;
+  padding: 9px !important;
+}
+
+/* Very narrow screens only: THEN allow stacking */
+@media (max-width: 900px) {
+  .workspace:not(.sidebar-collapsed) .kgen-topbar,
+  .workspace:not(.sidebar-collapsed) .kgen-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-brand-box,
+  .workspace:not(.sidebar-collapsed) .kgen-patient-box,
+  .workspace:not(.sidebar-collapsed) .kgen-title-box,
+  .workspace:not(.sidebar-collapsed) .kgen-live-panel,
+  .workspace:not(.sidebar-collapsed) .kgen-labs-panel,
+  .workspace:not(.sidebar-collapsed) .kgen-alert-panel,
+  .workspace:not(.sidebar-collapsed) .kgen-labs-small-panel,
+  .workspace:not(.sidebar-collapsed) .kgen-vitals-panel,
+  .workspace:not(.sidebar-collapsed) .kgen-med-panel {
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
+  }
+}
+
+/* =========================================================
+   FINAL SIDEBAR OPEN FIT FIX
+   Makes 100% browser zoom look like the good 80% layout
+   Paste at the VERY BOTTOM of ClinicalPhysiologyPage.css
+========================================================= */
+
+.workspace:not(.sidebar-collapsed) .dashboard-main:has(.kgen-page) {
+  padding: 10px 16px 18px !important;
+  overflow-x: hidden !important;
+  align-items: flex-start !important;
+}
+
+/* This is the key.
+   It scales only the KardioGenics clinical page when sidebar is open. */
+.workspace:not(.sidebar-collapsed) .kgen-page {
+  --kgen-sidebar-fit-scale: 0.80;
+
+  zoom: var(--kgen-sidebar-fit-scale);
+  width: calc(100% / var(--kgen-sidebar-fit-scale)) !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+/* Keep the header in one row even when sidebar is open */
+.workspace:not(.sidebar-collapsed) .kgen-topbar {
+  display: grid !important;
+  grid-template-columns: 300px 430px minmax(0, 1fr) !important;
+  gap: 12px !important;
+  align-items: stretch !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-brand-box,
+.workspace:not(.sidebar-collapsed) .kgen-patient-box,
+.workspace:not(.sidebar-collapsed) .kgen-title-box {
+  grid-column: auto !important;
+  min-height: 58px !important;
+  min-width: 0 !important;
+}
+
+/* Keep title as one line like your good screenshot */
+.workspace:not(.sidebar-collapsed) .kgen-title-box {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  line-height: 1 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-title-box span {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+}
+
+/* Keep the dashboard as 01/03/02 top row and 03/04/05 bottom row */
+.workspace:not(.sidebar-collapsed) .kgen-grid {
+  display: grid !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+  grid-auto-rows: auto !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+}
+
+/* Top row */
+.workspace:not(.sidebar-collapsed) .kgen-live-panel {
+  grid-column: 1 / span 6 !important;
+  grid-row: 1 !important;
+  min-height: 355px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-labs-panel {
+  grid-column: 7 / span 3 !important;
+  grid-row: 1 !important;
+  min-height: 355px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-alert-panel {
+  grid-column: 10 / span 3 !important;
+  grid-row: 1 !important;
+  min-height: 355px !important;
+}
+
+/* Bottom row */
+.workspace:not(.sidebar-collapsed) .kgen-labs-small-panel {
+  grid-column: 1 / span 3 !important;
+  grid-row: 2 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-vitals-panel {
+  grid-column: 4 / span 4 !important;
+  grid-row: 2 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-med-panel {
+  grid-column: 8 / span 5 !important;
+  grid-row: 2 !important;
+}
+
+/* Make sure 01 stays like your compact good version */
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-live-content {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 126px !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-wave-stack {
+  display: grid !important;
+  grid-template-rows: 1.08fr 0.5fr 1.08fr 0.5fr 18px !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-wave-card {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-side-vitals {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  min-width: 0 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-side-vital {
+  min-height: 0 !important;
+  height: 100% !important;
+  padding: 7px 7px 5px 10px !important;
+}
+
+/* Keep 02 from overflowing downward */
+.workspace:not(.sidebar-collapsed) .kgen-alert-panel {
+  overflow: hidden !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-alert-panel .kgen-alert-box {
+  flex: 1 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding: 12px 14px !important;
+  justify-content: center !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-alert-panel .kgen-alert-box p {
+  font-size: 9.8px !important;
+  line-height: 1.18 !important;
+  margin: 7px 0 !important;
+}
+
+/* Keep footer width aligned after zoom */
+.workspace:not(.sidebar-collapsed) .kgen-footer {
+  width: 100% !important;
+}
+
+/* Because the page is zoomed down, undo that zoom for the waveform popup */
+.workspace:not(.sidebar-collapsed) .kgen-wave-overlay-backdrop {
+  zoom: 1.22;
+}
+
+/* On very narrow screens only, allow mobile stacking */
+@media (max-width: 900px) {
+  .workspace:not(.sidebar-collapsed) .kgen-page {
+    zoom: 1;
+    width: 100% !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-topbar,
+  .workspace:not(.sidebar-collapsed) .kgen-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-brand-box,
+  .workspace:not(.sidebar-collapsed) .kgen-patient-box,
+  .workspace:not(.sidebar-collapsed) .kgen-title-box,
+  .workspace:not(.sidebar-collapsed) .kgen-live-panel,
+  .workspace:not(.sidebar-collapsed) .kgen-labs-panel,
+  .workspace:not(.sidebar-collapsed) .kgen-alert-panel,
+  .workspace:not(.sidebar-collapsed) .kgen-labs-small-panel,
+  .workspace:not(.sidebar-collapsed) .kgen-vitals-panel,
+  .workspace:not(.sidebar-collapsed) .kgen-med-panel {
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
+  }
+}
+
+/* =========================================================
+   FIX SIDEBAR OPEN 100% VIEW
+   Makes layout look like browser 80% zoom without clipping right side
+   Paste at the VERY BOTTOM of ClinicalPhysiologyPage.css
+========================================================= */
+
+/* Remove the previous zoom-based scaling */
+.workspace:not(.sidebar-collapsed) .kgen-page {
+  zoom: 1 !important;
+}
+
+/* Main area should not horizontally scroll or cut the visual scale */
+.workspace:not(.sidebar-collapsed) .dashboard-main:has(.kgen-page) {
+  padding: 10px 16px 18px !important;
+  overflow-x: hidden !important;
+  align-items: flex-start !important;
+}
+
+/* This gives the 80% visual effect safely */
+.workspace:not(.sidebar-collapsed) .kgen-page {
+  --kgen-fit-scale: 0.82;
+
+  transform: scale(var(--kgen-fit-scale)) !important;
+  transform-origin: top left !important;
+
+  width: calc(100% / var(--kgen-fit-scale)) !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+/* Keep the top bar as one row */
+.workspace:not(.sidebar-collapsed) .kgen-topbar {
+  display: grid !important;
+  grid-template-columns: 285px 420px minmax(0, 1fr) !important;
+  gap: 12px !important;
+  align-items: stretch !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-brand-box,
+.workspace:not(.sidebar-collapsed) .kgen-patient-box,
+.workspace:not(.sidebar-collapsed) .kgen-title-box {
+  grid-column: auto !important;
+  min-width: 0 !important;
+  min-height: 58px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-title-box,
+.workspace:not(.sidebar-collapsed) .kgen-title-box span {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+}
+
+/* Keep the 01 / 03 / 02 and 03 / 04 / 05 layout */
+.workspace:not(.sidebar-collapsed) .kgen-grid {
+  display: grid !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel {
+  grid-column: 1 / span 6 !important;
+  grid-row: 1 !important;
+  min-height: 355px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-labs-panel {
+  grid-column: 7 / span 3 !important;
+  grid-row: 1 !important;
+  min-height: 355px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-alert-panel {
+  grid-column: 10 / span 3 !important;
+  grid-row: 1 !important;
+  min-height: 355px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-labs-small-panel {
+  grid-column: 1 / span 3 !important;
+  grid-row: 2 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-vitals-panel {
+  grid-column: 4 / span 4 !important;
+  grid-row: 2 !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-med-panel {
+  grid-column: 8 / span 5 !important;
+  grid-row: 2 !important;
+}
+
+/* Keep 01 compact */
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-live-content {
+  grid-template-columns: minmax(0, 1fr) 126px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-wave-stack {
+  display: grid !important;
+  grid-template-rows: 1.08fr 0.5fr 1.08fr 0.5fr 18px !important;
+  gap: 6px !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-live-panel .kgen-side-vitals {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+}
+
+/* Prevent 02 from visually spilling */
+.workspace:not(.sidebar-collapsed) .kgen-alert-panel {
+  overflow: hidden !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-alert-box {
+  overflow: hidden !important;
+}
+
+.workspace:not(.sidebar-collapsed) .kgen-alert-box p {
+  font-size: 9.8px !important;
+  line-height: 1.18 !important;
+}
+
+/* Important: popup should not be scaled with the dashboard */
+.workspace:not(.sidebar-collapsed) .kgen-wave-overlay-backdrop {
+  transform: scale(calc(1 / var(--kgen-fit-scale))) !important;
+  transform-origin: top left !important;
+  width: calc(100vw * var(--kgen-fit-scale)) !important;
+  height: calc(100vh * var(--kgen-fit-scale)) !important;
+}
+
+/* =========================================================
+   FINAL FIX: STOP EXTRA DASHBOARD SCROLL WHEN SIDEBAR IS OPEN
+   Your first view is good. This prevents scrolling into the
+   fake unscaled layout space created by transform: scale().
+========================================================= */
+
+@media (min-width: 901px) {
+  .workspace:not(.sidebar-collapsed) .dashboard-main:has(.kgen-page) {
+    height: calc(100vh - 64px) !important;
+    max-height: calc(100vh - 64px) !important;
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
+    padding: 10px 16px 12px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-page {
+    --kgen-fit-scale: 0.82;
+
+    transform: scale(var(--kgen-fit-scale)) !important;
+    transform-origin: top left !important;
+    width: calc(100% / var(--kgen-fit-scale)) !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+    align-items: stretch !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-live-panel {
+    grid-column: 1 / span 6 !important;
+    grid-row: 1 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-labs-panel {
+    grid-column: 7 / span 3 !important;
+    grid-row: 1 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-alert-panel {
+    grid-column: 10 / span 3 !important;
+    grid-row: 1 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-labs-small-panel {
+    grid-column: 1 / span 3 !important;
+    grid-row: 2 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-vitals-panel {
+    grid-column: 4 / span 4 !important;
+    grid-row: 2 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-med-panel {
+    grid-column: 8 / span 5 !important;
+    grid-row: 2 !important;
+  }
+}
+
+/* =========================================================
+   FINAL FOOTER / WHITESPACE FIX
+   Fixes blank space below footer and keeps footer as page end
+========================================================= */
+
+/* ---------- SIDEBAR CLOSED / FULL DASHBOARD WIDTH ---------- */
+/* Footer becomes the final visible thing, not followed by empty gray space */
+.workspace.sidebar-collapsed .dashboard-main:has(.kgen-page) {
+  height: calc(100vh - 64px) !important;
+  min-height: calc(100vh - 64px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding-bottom: 10px !important;
+}
+
+.workspace.sidebar-collapsed .kgen-page {
+  min-height: calc(100vh - 64px - 20px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.workspace.sidebar-collapsed .kgen-footer {
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+}
+
+
+/* ---------- SIDEBAR OPEN / PATIENT DIRECTORY VISIBLE ---------- */
+/* Your first view already looks good. Do not allow scrolling into
+   the fake extra height created by transform: scale(). */
+.workspace:not(.sidebar-collapsed) .dashboard-main:has(.kgen-page) {
+  height: calc(100vh - 64px) !important;
+  max-height: calc(100vh - 64px) !important;
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+  padding-bottom: 8px !important;
+}
+
+/* Keep the scaled monitor layout, but remove bottom fake space */
+.workspace:not(.sidebar-collapsed) .kgen-page {
+  --kgen-fit-scale: 0.82;
+
+  transform: scale(var(--kgen-fit-scale)) !important;
+  transform-origin: top left !important;
+  width: calc(100% / var(--kgen-fit-scale)) !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+/* Footer must be the last visual element */
+.workspace:not(.sidebar-collapsed) .kgen-footer {
+  margin-bottom: 0 !important;
+}
+
+/* =========================================================
+   TECH LEAD FINAL LAYOUT DECISION
+   Sidebar open = dashboard should NOT scroll.
+   Patient sidebar may scroll, but clinical monitor must fit one screen.
+   Footer is always visible as the final dashboard row.
+========================================================= */
+
+@media (min-width: 1000px) {
+  .workspace:not(.sidebar-collapsed) .dashboard-main:has(.kgen-page) {
+    --kgen-navbar-height: 64px;
+
+    height: calc(100vh - var(--kgen-navbar-height)) !important;
+    height: calc(100dvh - var(--kgen-navbar-height)) !important;
+    max-height: calc(100vh - var(--kgen-navbar-height)) !important;
+    max-height: calc(100dvh - var(--kgen-navbar-height)) !important;
+
+    padding: 8px 14px !important;
+    overflow: hidden !important;
+    display: block !important;
+    background: #f3f5f7 !important;
+  }
+
+  /* Kill older zoom/transform hacks */
+  .workspace:not(.sidebar-collapsed) .kgen-page {
+    zoom: 1 !important;
+    transform: none !important;
+    transform-origin: initial !important;
+
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+
+    display: grid !important;
+    grid-template-rows: 54px minmax(0, 1fr) 28px !important;
+    gap: 8px !important;
+    overflow: hidden !important;
+  }
+
+  /* ---------- TOP HEADER ---------- */
+
+  .workspace:not(.sidebar-collapsed) .kgen-topbar {
+    height: 54px !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: 240px 350px minmax(0, 1fr) !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-brand-box,
+  .workspace:not(.sidebar-collapsed) .kgen-patient-box,
+  .workspace:not(.sidebar-collapsed) .kgen-title-box {
+    min-height: 0 !important;
+    height: 54px !important;
+    grid-column: auto !important;
+    min-width: 0 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-brand-box span {
+    font-size: 18px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-patient-box strong {
+    font-size: 22px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-title-box {
+    font-size: clamp(15px, 1.2vw, 19px) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-title-box span {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+  }
+
+  /* ---------- MAIN DASHBOARD GRID ---------- */
+
+  .workspace:not(.sidebar-collapsed) .kgen-grid {
+    height: 100% !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    grid-template-rows: minmax(0, 1.34fr) minmax(0, 0.88fr) !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+    overflow: hidden !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-panel {
+    min-height: 0 !important;
+    overflow: hidden !important;
+    padding: 8px 10px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-panel h2 {
+    font-size: 16px !important;
+    line-height: 1.05 !important;
+    margin-bottom: 7px !important;
+  }
+
+  /* Top row */
+  .workspace:not(.sidebar-collapsed) .kgen-live-panel {
+    grid-column: 1 / span 6 !important;
+    grid-row: 1 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-labs-panel {
+    grid-column: 7 / span 3 !important;
+    grid-row: 1 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-alert-panel {
+    grid-column: 10 / span 3 !important;
+    grid-row: 1 !important;
+  }
+
+  /* Bottom row */
+  .workspace:not(.sidebar-collapsed) .kgen-labs-small-panel {
+    grid-column: 1 / span 3 !important;
+    grid-row: 2 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-vitals-panel {
+    grid-column: 4 / span 4 !important;
+    grid-row: 2 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-med-panel {
+    grid-column: 8 / span 5 !important;
+    grid-row: 2 !important;
+  }
+
+  /* ---------- 01 LIVE PHYSIOLOGY ---------- */
+
+  .workspace:not(.sidebar-collapsed) .kgen-live-panel {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-panel-title-row {
+    flex: 0 0 auto !important;
+    margin-bottom: 7px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-header-clock {
+    padding: 4px 8px !important;
+    font-size: 10px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-live-content {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 112px !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-wave-stack {
+    height: 100% !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-rows: 1.05fr 0.45fr 1.05fr 0.45fr 16px !important;
+    gap: 5px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-wave-card {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-time-axis {
+    height: 16px !important;
+    font-size: 9px !important;
+    padding: 0 8px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-side-vitals {
+    height: 100% !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-side-vital {
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 6px 6px 4px 8px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-side-vital span {
+    font-size: 9.5px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-side-vital strong {
+    font-size: 23px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-side-vital .kgen-mini-trend-box {
+    height: 30px !important;
+    min-height: 30px !important;
+  }
+
+  /* ---------- 03 TOP LABS ---------- */
+
+  .workspace:not(.sidebar-collapsed) .kgen-labs-panel {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-labs-panel > .kgen-lab-grid {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-lab-tile {
+    min-height: 0 !important;
+    padding: 7px 8px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-lab-value-row strong {
+    font-size: 26px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-labs-panel .kgen-mini-table {
+    flex: 0 0 auto !important;
+    margin: 7px 0 7px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-labs-panel .kgen-blue-btn {
+    flex: 0 0 auto !important;
+    padding: 7px 10px !important;
+  }
+
+  /* ---------- 02 ALERT PANEL ---------- */
+
+  .workspace:not(.sidebar-collapsed) .kgen-alert-panel {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-alert-box {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    padding: 10px 12px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-alert-icon {
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 29px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-alert-box h3 {
+    font-size: 14.5px !important;
+    line-height: 1.1 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-alert-box p {
+    font-size: 9.3px !important;
+    line-height: 1.15 !important;
+    margin: 6px 0 !important;
+  }
+
+  /* ---------- BOTTOM ROW ---------- */
+
+  .workspace:not(.sidebar-collapsed) .kgen-labs-small-panel,
+  .workspace:not(.sidebar-collapsed) .kgen-vitals-panel,
+  .workspace:not(.sidebar-collapsed) .kgen-med-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-labs-small-panel > .kgen-lab-grid {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-vitals-panel .kgen-table,
+  .workspace:not(.sidebar-collapsed) .kgen-med-panel .kgen-table {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: 100% !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-table th {
+    padding: 7px 8px !important;
+    font-size: 10px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-table td {
+    padding: 7px 8px !important;
+    font-size: 12.5px !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-table td strong {
+    font-size: 12.5px !important;
+  }
+
+  /* ---------- FOOTER ALWAYS VISIBLE ---------- */
+
+  .workspace:not(.sidebar-collapsed) .kgen-footer {
+    height: 28px !important;
+    min-height: 28px !important;
+    margin: 0 !important;
+    padding: 0 12px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    overflow: hidden !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+  }
+
+  .workspace:not(.sidebar-collapsed) .kgen-footer strong {
+    font-size: 11px !important;
+  }
+}
