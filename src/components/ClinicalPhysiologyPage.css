@@ -3082,3 +3082,1286 @@ body.kgen-wave-modal-open {
     font-size: 11px !important;
   }
 }
+
+/* =========================================================
+   FIRELY DYNAMIC SEVERITY COLORS
+   red = critical, yellow = warning, blue = stable/monitored
+========================================================= */
+
+/* Main waveform labels */
+.kgen-wave-label.yellow {
+  color: #b7791f !important;
+}
+
+/* Main waveform lines */
+.kgen-wave-card.yellow polyline {
+  stroke: #d69223 !important;
+  filter:
+    drop-shadow(0 0 2px rgba(214, 146, 35, 0.22))
+    drop-shadow(0 0 5px rgba(214, 146, 35, 0.12));
+}
+
+/* Mini trend boxes */
+.kgen-mini-trend-box.yellow {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 248, 226, 0.96) 100%) !important;
+}
+
+.kgen-mini-trend.yellow polyline {
+  stroke: #d69223 !important;
+  filter:
+    drop-shadow(0 0 2px rgba(214, 146, 35, 0.24))
+    drop-shadow(0 0 5px rgba(214, 146, 35, 0.14));
+}
+
+/* Alert panel themes */
+.kgen-alert-panel.red {
+  background: #f6e1de !important;
+  border-color: #9b322f !important;
+}
+
+.kgen-alert-panel.yellow {
+  background: #fff4d7 !important;
+  border-color: #d69223 !important;
+}
+
+.kgen-alert-panel.blue {
+  background: #e8f4ff !important;
+  border-color: #4d92a8 !important;
+}
+
+.kgen-alert-panel.red .kgen-alert-box {
+  background: #f0d1cd !important;
+  border-color: #b66560 !important;
+}
+
+.kgen-alert-panel.yellow .kgen-alert-box {
+  background: #fff0c2 !important;
+  border-color: #d69223 !important;
+}
+
+.kgen-alert-panel.blue .kgen-alert-box {
+  background: #dff0fb !important;
+  border-color: #4d92a8 !important;
+}
+
+.kgen-alert-panel.red .kgen-alert-icon {
+  background: #a51e22 !important;
+}
+
+.kgen-alert-panel.yellow .kgen-alert-icon {
+  background: #d69223 !important;
+}
+
+.kgen-alert-panel.blue .kgen-alert-icon {
+  background: #1d617c !important;
+}
+
+.kgen-alert-panel.red .kgen-alert-box h3 {
+  color: #7f1d1d !important;
+}
+
+.kgen-alert-panel.yellow .kgen-alert-box h3 {
+  color: #8a5a00 !important;
+}
+
+.kgen-alert-panel.blue .kgen-alert-box h3 {
+  color: #1d617c !important;
+}
+
+/* Waveform popup yellow support */
+.kgen-wave-overlay-chart.yellow polyline {
+  stroke: #d69223 !important;
+  filter:
+    drop-shadow(0 0 3px rgba(214, 146, 35, 0.28))
+    drop-shadow(0 0 8px rgba(214, 146, 35, 0.16));
+}
+
+/* =========================================================
+   16:9 CLINICAL MONITOR FORM FACTOR PATCH
+   Goal:
+   - ECG/PPG wide and short
+   - Lab cards compact
+   - Alert panel tall but not oversized
+   - Footer visible
+   - Dashboard fits like a monitor screen
+========================================================= */
+
+@media (min-width: 1180px) {
+  .dashboard-main:has(.kgen-page) {
+    height: calc(100vh - 64px) !important;
+    height: calc(100dvh - 64px) !important;
+    max-height: calc(100vh - 64px) !important;
+    max-height: calc(100dvh - 64px) !important;
+
+    padding: 8px 12px 8px !important;
+    overflow: hidden !important;
+    background: #f3f5f7 !important;
+  }
+
+  .kgen-page {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+
+    display: grid !important;
+    grid-template-rows: 54px minmax(0, 1fr) 28px !important;
+    gap: 8px !important;
+
+    overflow: hidden !important;
+  }
+
+  /* ---------- Header becomes flatter and monitor-like ---------- */
+
+  .kgen-topbar {
+    height: 54px !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: 250px 390px minmax(0, 1fr) !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+  }
+
+  .kgen-brand-box,
+  .kgen-patient-box,
+  .kgen-title-box {
+    min-height: 0 !important;
+    height: 54px !important;
+    border-radius: 5px !important;
+  }
+
+  .kgen-brand-box {
+    padding: 0 14px !important;
+  }
+
+  .kgen-logo {
+    font-size: 24px !important;
+  }
+
+  .kgen-brand-box span {
+    font-size: 18px !important;
+  }
+
+  .kgen-patient-box {
+    padding: 6px 12px !important;
+  }
+
+  .kgen-patient-box strong {
+    font-size: 22px !important;
+  }
+
+  .kgen-patient-box span {
+    font-size: 10px !important;
+  }
+
+  .kgen-title-box {
+    padding: 0 14px !important;
+    font-size: clamp(18px, 1.45vw, 24px) !important;
+    white-space: nowrap !important;
+  }
+
+  /* ---------- Whole dashboard grid fits one screen ---------- */
+
+  .kgen-grid {
+    height: 100% !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    grid-template-rows: minmax(0, 1.24fr) minmax(0, 0.76fr) !important;
+
+    gap: 10px !important;
+    align-items: stretch !important;
+    overflow: hidden !important;
+  }
+
+  .kgen-panel {
+    min-height: 0 !important;
+    overflow: hidden !important;
+    padding: 8px 10px !important;
+    border-radius: 8px !important;
+  }
+
+  .kgen-panel h2 {
+    font-size: 16px !important;
+    line-height: 1.05 !important;
+    margin: 0 0 7px !important;
+  }
+
+  /* ---------- Keep current 12-column placement ---------- */
+
+  .kgen-live-panel {
+    grid-column: 1 / span 6 !important;
+    grid-row: 1 !important;
+  }
+
+  .kgen-labs-panel {
+    grid-column: 7 / span 3 !important;
+    grid-row: 1 !important;
+  }
+
+  .kgen-alert-panel {
+    grid-column: 10 / span 3 !important;
+    grid-row: 1 !important;
+  }
+
+  .kgen-labs-small-panel {
+    grid-column: 1 / span 3 !important;
+    grid-row: 2 !important;
+  }
+
+  .kgen-vitals-panel {
+    grid-column: 4 / span 4 !important;
+    grid-row: 2 !important;
+  }
+
+  .kgen-med-panel {
+    grid-column: 8 / span 5 !important;
+    grid-row: 2 !important;
+  }
+
+  /* =========================================================
+     01. LIVE PHYSIOLOGY
+     Make ECG/PPG wide and short like the reference
+  ========================================================= */
+
+  .kgen-live-panel {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .kgen-panel-title-row {
+    flex: 0 0 auto !important;
+    margin-bottom: 6px !important;
+  }
+
+  .kgen-header-clock {
+    padding: 4px 8px !important;
+    font-size: 10px !important;
+  }
+
+  .kgen-live-content {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 118px !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+  }
+
+  .kgen-wave-stack {
+    height: 100% !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-rows: 0.9fr 0.36fr 0.9fr 0.36fr 15px !important;
+    gap: 5px !important;
+  }
+
+  .kgen-wave-card {
+    height: 100% !important;
+    min-height: 0 !important;
+    flex: none !important;
+    border-radius: 5px !important;
+    background-size: 31px 31px !important;
+  }
+
+  .kgen-wave-card.compact {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .kgen-wave-card polyline {
+    stroke-width: 1.65 !important;
+  }
+
+  .kgen-wave-card.compact polyline {
+    stroke-width: 1.35 !important;
+  }
+
+  .kgen-wave-label {
+    top: 6px !important;
+    left: 10px !important;
+    font-size: 10px !important;
+  }
+
+  .kgen-time-axis {
+    height: 15px !important;
+    padding: 0 8px !important;
+    font-size: 9px !important;
+    line-height: 1 !important;
+    align-items: center !important;
+  }
+
+  .kgen-side-vitals {
+    height: 100% !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  .kgen-side-vital {
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 6px 6px 4px 8px !important;
+  }
+
+  .kgen-side-vital span {
+    font-size: 9.5px !important;
+  }
+
+  .kgen-side-vital strong {
+    font-size: 24px !important;
+  }
+
+  .kgen-side-vital .kgen-mini-trend-box {
+    height: 29px !important;
+    min-height: 29px !important;
+  }
+
+  /* =========================================================
+     03. LAB CARDS
+     Compact square/rectangle cards with dates at graph end
+  ========================================================= */
+
+  .kgen-labs-panel {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .kgen-labs-panel > .kgen-lab-grid {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+  }
+
+  .kgen-labs-small-panel > .kgen-lab-grid {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+  }
+
+  .kgen-lab-tile {
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 7px 8px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    overflow: hidden !important;
+  }
+
+  .kgen-lab-title {
+    flex: 0 0 auto !important;
+  }
+
+  .kgen-lab-title span {
+    font-size: 10.5px !important;
+  }
+
+  .kgen-lab-title button {
+    font-size: 18px !important;
+    cursor: pointer !important;
+  }
+
+  .kgen-lab-value-row {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 56px !important;
+    gap: 5px !important;
+    align-items: end !important;
+  }
+
+  .kgen-lab-reading {
+    min-width: 0 !important;
+  }
+
+  .kgen-lab-reading strong,
+  .kgen-lab-value-row strong {
+    margin: 0 !important;
+    font-size: 26px !important;
+    line-height: 0.95 !important;
+    font-weight: 950 !important;
+    color: #991b1b !important;
+  }
+
+  .kgen-lab-reading small {
+    display: block !important;
+    margin-top: 3px !important;
+    font-size: 8.2px !important;
+    line-height: 1 !important;
+    font-weight: 900 !important;
+    color: #7f1d1d !important;
+    white-space: nowrap !important;
+  }
+
+  .kgen-lab-tile.yellow .kgen-lab-reading strong,
+  .kgen-lab-tile.yellow .kgen-lab-reading small {
+    color: #8a5a00 !important;
+  }
+
+  .kgen-lab-tile.blue .kgen-lab-reading strong,
+  .kgen-lab-tile.blue .kgen-lab-reading small {
+    color: #1d617c !important;
+  }
+
+  .kgen-lab-spark-wrap {
+    width: 56px !important;
+    min-width: 56px !important;
+
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) 11px !important;
+    gap: 2px !important;
+    align-self: stretch !important;
+  }
+
+  .kgen-lab-spark-wrap .kgen-mini-trend-box {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 36px !important;
+    border-radius: 7px !important;
+  }
+
+  .kgen-lab-spark-wrap .kgen-mini-trend {
+    height: 100% !important;
+  }
+
+  .kgen-lab-spark-dates {
+    display: flex !important;
+    justify-content: space-between !important;
+    gap: 3px !important;
+    font-size: 7.2px !important;
+    line-height: 1 !important;
+    font-weight: 900 !important;
+    color: #050b14 !important;
+    white-space: nowrap !important;
+  }
+
+  /* Hide the old meta line if old CSS still targets it */
+  .kgen-lab-meta-line {
+    display: none !important;
+  }
+
+  .kgen-labs-panel .kgen-mini-table {
+    flex: 0 0 auto !important;
+    margin: 7px 0 7px !important;
+  }
+
+  .kgen-mini-table span,
+  .kgen-mini-table b {
+    min-height: 17px !important;
+    font-size: 9px !important;
+  }
+
+  .kgen-labs-panel .kgen-blue-btn,
+  .kgen-labs-small-panel .kgen-blue-btn {
+    flex: 0 0 auto !important;
+    padding: 7px 10px !important;
+    font-size: 12px !important;
+  }
+
+  /* =========================================================
+     02. ALERT PANEL
+     Tall but not oversized
+  ========================================================= */
+
+  .kgen-alert-panel {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .kgen-alert-box {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    padding: 10px 12px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+
+  .kgen-alert-icon {
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 29px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .kgen-alert-box h3 {
+    font-size: 14.5px !important;
+    line-height: 1.1 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .kgen-alert-box p {
+    font-size: 9.4px !important;
+    line-height: 1.15 !important;
+    margin: 6px 0 !important;
+  }
+
+  /* =========================================================
+     04 / 05 TABLES
+     Compact bottom row
+  ========================================================= */
+
+  .kgen-labs-small-panel,
+  .kgen-vitals-panel,
+  .kgen-med-panel {
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .kgen-vitals-panel .kgen-table,
+  .kgen-med-panel .kgen-table {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: 100% !important;
+  }
+
+  .kgen-table th {
+    padding: 7px 8px !important;
+    font-size: 10px !important;
+  }
+
+  .kgen-table td {
+    padding: 7px 8px !important;
+    font-size: 12.5px !important;
+  }
+
+  .kgen-table td strong {
+    font-size: 12.5px !important;
+  }
+
+  .kgen-table td small {
+    font-size: 9px !important;
+  }
+
+  /* =========================================================
+     FOOTER
+     Always visible at bottom of monitor
+  ========================================================= */
+
+  .kgen-footer {
+    height: 28px !important;
+    min-height: 28px !important;
+    margin: 0 !important;
+    padding: 0 12px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    overflow: hidden !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-footer strong {
+    font-size: 11px !important;
+  }
+}
+
+/* =========================================================
+   FINAL 16:9 CLINICAL MONITOR FORM FACTOR PATCH
+   Purpose:
+   - ECG/PPG wide and short
+   - Lab cards compact
+   - Alert panel controlled
+   - Footer visible
+   - Bottom row not cut off
+   - No transform/zoom fake layout
+========================================================= */
+
+@media (min-width: 1180px) {
+  /* ---------- Main page frame ---------- */
+
+  .dashboard-main:has(.kgen-page) {
+    height: calc(100vh - 64px) !important;
+    height: calc(100dvh - 64px) !important;
+    max-height: calc(100vh - 64px) !important;
+    max-height: calc(100dvh - 64px) !important;
+
+    padding: 7px 10px 7px !important;
+    overflow: hidden !important;
+    background: #f3f5f7 !important;
+  }
+
+  .kgen-page {
+    transform: none !important;
+    zoom: 1 !important;
+
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+
+    display: grid !important;
+    grid-template-rows: 52px minmax(0, 1fr) 27px !important;
+    gap: 6px !important;
+
+    overflow: hidden !important;
+  }
+
+  /* ---------- Header ---------- */
+
+  .kgen-topbar {
+    height: 52px !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: 270px 430px minmax(0, 1fr) !important;
+    gap: 9px !important;
+    align-items: stretch !important;
+  }
+
+  .kgen-brand-box,
+  .kgen-patient-box,
+  .kgen-title-box {
+    height: 52px !important;
+    min-height: 0 !important;
+    border-radius: 5px !important;
+  }
+
+  .kgen-brand-box {
+    padding: 0 16px !important;
+    gap: 10px !important;
+  }
+
+  .kgen-logo {
+    font-size: 22px !important;
+  }
+
+  .kgen-brand-box span {
+    font-size: 20px !important;
+  }
+
+  .kgen-patient-box {
+    padding: 5px 12px !important;
+  }
+
+  .kgen-patient-box strong {
+    font-size: 23px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-patient-box span {
+    margin-top: 4px !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-title-box {
+    padding: 0 18px !important;
+    font-size: clamp(18px, 1.45vw, 24px) !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+
+  /* ---------- Main grid ---------- */
+
+  .kgen-grid {
+    height: 100% !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+
+    /* top row gets enough space, bottom row gets enough space */
+    grid-template-rows: minmax(0, 1.15fr) minmax(0, 0.74fr) !important;
+
+    gap: 8px !important;
+    align-items: stretch !important;
+    overflow: hidden !important;
+  }
+
+  .kgen-panel {
+    min-height: 0 !important;
+    overflow: hidden !important;
+    padding: 7px 9px !important;
+    border-radius: 8px !important;
+  }
+
+  .kgen-panel h2 {
+    font-size: 16px !important;
+    line-height: 1.05 !important;
+    margin: 0 0 6px !important;
+  }
+
+  .kgen-live-panel {
+    grid-column: 1 / span 6 !important;
+    grid-row: 1 !important;
+  }
+
+  .kgen-labs-panel {
+    grid-column: 7 / span 3 !important;
+    grid-row: 1 !important;
+  }
+
+  .kgen-alert-panel {
+    grid-column: 10 / span 3 !important;
+    grid-row: 1 !important;
+  }
+
+  .kgen-labs-small-panel {
+    grid-column: 1 / span 3 !important;
+    grid-row: 2 !important;
+  }
+
+  .kgen-vitals-panel {
+    grid-column: 4 / span 4 !important;
+    grid-row: 2 !important;
+  }
+
+  .kgen-med-panel {
+    grid-column: 8 / span 5 !important;
+    grid-row: 2 !important;
+  }
+
+  /* =========================================================
+     01. Live Physiology
+     Wide and short monitor strips
+  ========================================================= */
+
+  .kgen-live-panel {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .kgen-panel-title-row {
+    flex: 0 0 24px !important;
+    min-height: 24px !important;
+    margin-bottom: 5px !important;
+  }
+
+  .kgen-header-clock {
+    padding: 3px 7px !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-live-content {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 120px !important;
+    gap: 7px !important;
+    align-items: stretch !important;
+  }
+
+  .kgen-wave-stack {
+    height: 100% !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+
+    /* This is the important part: wide and short strips */
+    grid-template-rows:
+      minmax(0, 0.82fr)
+      minmax(0, 0.32fr)
+      minmax(0, 0.82fr)
+      minmax(0, 0.32fr)
+      15px !important;
+
+    gap: 4px !important;
+  }
+
+  .kgen-wave-card {
+    height: 100% !important;
+    min-height: 0 !important;
+    flex: none !important;
+
+    border-radius: 5px !important;
+    background-size: 32px 32px !important;
+  }
+
+  .kgen-wave-card.compact {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .kgen-wave-card polyline {
+    stroke-width: 1.55 !important;
+  }
+
+  .kgen-wave-card.compact polyline {
+    stroke-width: 1.25 !important;
+  }
+
+  .kgen-wave-label {
+    top: 6px !important;
+    left: 10px !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-time-axis {
+    height: 15px !important;
+    padding: 0 8px !important;
+    font-size: 9px !important;
+    line-height: 1 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  .kgen-side-vitals {
+    height: 100% !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+  }
+
+  .kgen-side-vital {
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 5px 6px 4px 8px !important;
+  }
+
+  .kgen-side-vital span {
+    font-size: 9.5px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-side-vital strong {
+    font-size: 24px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-side-vital .kgen-mini-trend-box {
+    height: 27px !important;
+    min-height: 27px !important;
+  }
+
+  /* =========================================================
+     03. Lab trends
+     Compact cards with date labels at graph end
+  ========================================================= */
+
+  .kgen-labs-panel,
+  .kgen-labs-small-panel {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .kgen-labs-panel > .kgen-lab-grid {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  .kgen-labs-small-panel > .kgen-lab-grid {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+    gap: 6px !important;
+    margin-bottom: 7px !important;
+  }
+
+  .kgen-lab-tile {
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 6px 7px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+
+    overflow: hidden !important;
+    border-radius: 7px !important;
+  }
+
+  .kgen-lab-title {
+    flex: 0 0 auto !important;
+  }
+
+  .kgen-lab-title span {
+    font-size: 10.5px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-lab-title button {
+    font-size: 18px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-lab-value-row {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 58px !important;
+    gap: 5px !important;
+    align-items: end !important;
+  }
+
+  .kgen-lab-reading {
+    min-width: 0 !important;
+  }
+
+  .kgen-lab-reading strong,
+  .kgen-lab-value-row strong {
+    display: block !important;
+    margin: 0 !important;
+
+    font-size: 25px !important;
+    line-height: 0.95 !important;
+    font-weight: 950 !important;
+    color: #991b1b !important;
+  }
+
+  .kgen-lab-reading small {
+    display: block !important;
+    margin-top: 3px !important;
+
+    font-size: 8px !important;
+    line-height: 1 !important;
+    font-weight: 900 !important;
+    color: #7f1d1d !important;
+    white-space: nowrap !important;
+  }
+
+  .kgen-lab-spark-wrap {
+    width: 58px !important;
+    min-width: 58px !important;
+
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) 10px !important;
+    gap: 2px !important;
+    align-self: stretch !important;
+  }
+
+  .kgen-lab-spark-wrap .kgen-mini-trend-box {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 30px !important;
+    border-radius: 7px !important;
+  }
+
+  .kgen-lab-spark-wrap .kgen-mini-trend {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .kgen-lab-spark-dates {
+    display: flex !important;
+    justify-content: space-between !important;
+    gap: 3px !important;
+
+    font-size: 7px !important;
+    line-height: 1 !important;
+    font-weight: 950 !important;
+    color: #050b14 !important;
+    white-space: nowrap !important;
+  }
+
+  .kgen-lab-meta-line {
+    display: none !important;
+  }
+
+  .kgen-labs-panel .kgen-mini-table {
+    flex: 0 0 auto !important;
+    margin: 6px 0 6px !important;
+  }
+
+  .kgen-mini-table span,
+  .kgen-mini-table b {
+    min-height: 16px !important;
+    font-size: 9px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-labs-panel .kgen-blue-btn,
+  .kgen-labs-small-panel .kgen-blue-btn {
+    flex: 0 0 auto !important;
+    padding: 7px 9px !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+  }
+
+  /* Color-aware lab text */
+  .kgen-lab-tile.yellow .kgen-lab-reading strong,
+  .kgen-lab-tile.yellow .kgen-lab-reading small {
+    color: #8a5a00 !important;
+  }
+
+  .kgen-lab-tile.blue .kgen-lab-reading strong,
+  .kgen-lab-tile.blue .kgen-lab-reading small {
+    color: #1d617c !important;
+  }
+
+  /* =========================================================
+     02. Alert panel
+     Tall enough, but not oversized
+  ========================================================= */
+
+  .kgen-alert-panel {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .kgen-alert-box {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+
+    padding: 10px 12px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+
+  .kgen-alert-icon {
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 29px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .kgen-alert-box h3 {
+    font-size: 14.5px !important;
+    line-height: 1.1 !important;
+    margin: 0 0 8px !important;
+  }
+
+  .kgen-alert-box p {
+    font-size: 9.2px !important;
+    line-height: 1.14 !important;
+    margin: 5px 0 !important;
+  }
+
+  /* =========================================================
+     04 and 05 bottom row
+     Fix the row clipping problem
+  ========================================================= */
+
+  .kgen-labs-small-panel,
+  .kgen-vitals-panel,
+  .kgen-med-panel {
+    min-height: 0 !important;
+    overflow: hidden !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .kgen-vitals-panel .kgen-table,
+  .kgen-med-panel .kgen-table {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  .kgen-table {
+    table-layout: fixed !important;
+  }
+
+  .kgen-table thead {
+    height: 34px !important;
+  }
+
+  .kgen-table th {
+    padding: 6px 8px !important;
+    font-size: 9.5px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-table tbody tr {
+    height: 36px !important;
+  }
+
+  .kgen-table td {
+    padding: 5px 8px !important;
+    font-size: 12px !important;
+    line-height: 1.05 !important;
+  }
+
+  .kgen-table td strong {
+    font-size: 12px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-table td small {
+    margin-top: 2px !important;
+    font-size: 8.5px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-ok,
+  .kgen-no {
+    width: 15px !important;
+    height: 15px !important;
+    font-size: 10px !important;
+  }
+
+  .kgen-warning {
+    font-size: 14px !important;
+  }
+
+  /* =========================================================
+     Footer
+  ========================================================= */
+
+  .kgen-footer {
+    height: 27px !important;
+    min-height: 27px !important;
+    margin: 0 !important;
+    padding: 0 12px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    overflow: hidden !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-footer strong {
+    font-size: 11px !important;
+  }
+}
+
+/* =========================================================
+   FINAL HEADER SPACING + TITLE FIT PATCH
+   Fixes:
+   - top row touching/squishing against header
+   - title text getting clipped
+   - keeps 16:9 monitor layout
+========================================================= */
+
+@media (min-width: 1180px) {
+  /* Give the page a little more breathing room between header and cards */
+  .kgen-page {
+    grid-template-rows: 54px minmax(0, 1fr) 27px !important;
+    gap: 10px !important;
+  }
+
+  /* Header should stay compact but not cramped */
+  .kgen-topbar {
+    height: 54px !important;
+    min-height: 54px !important;
+    grid-template-columns: 250px 390px minmax(0, 1fr) !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+  }
+
+  .kgen-brand-box,
+  .kgen-patient-box,
+  .kgen-title-box {
+    height: 54px !important;
+    min-height: 54px !important;
+  }
+
+  /* Slightly reduce brand width pressure */
+  .kgen-brand-box {
+    padding: 0 14px !important;
+  }
+
+  .kgen-brand-box span {
+    font-size: 19px !important;
+  }
+
+  .kgen-logo {
+    font-size: 22px !important;
+  }
+
+  /* Patient box should not steal too much title space */
+  .kgen-patient-box {
+    padding: 6px 12px !important;
+  }
+
+  .kgen-patient-box strong {
+    font-size: 22px !important;
+    line-height: 1 !important;
+  }
+
+  .kgen-patient-box span {
+    font-size: 10px !important;
+    line-height: 1 !important;
+    margin-top: 4px !important;
+  }
+
+  /* This is the main title fix */
+  .kgen-title-box {
+    min-width: 0 !important;
+    padding: 0 14px !important;
+    overflow: hidden !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    font-size: clamp(15px, 1.28vw, 22px) !important;
+    line-height: 1 !important;
+    letter-spacing: -0.015em !important;
+    white-space: nowrap !important;
+  }
+
+  .kgen-title-box span {
+    display: block !important;
+    max-width: 100% !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: clip !important;
+  }
+
+  /* Push the dashboard cards slightly below the header */
+  .kgen-grid {
+    margin-top: 0 !important;
+    height: 100% !important;
+    min-height: 0 !important;
+
+    grid-template-rows: minmax(0, 1.1fr) minmax(0, 0.74fr) !important;
+    gap: 8px !important;
+  }
+
+  /* Since we added header gap, make cards a tiny bit tighter */
+  .kgen-panel {
+    padding-top: 7px !important;
+    padding-bottom: 7px !important;
+  }
+
+  .kgen-panel h2 {
+    font-size: 15.5px !important;
+    margin-bottom: 5px !important;
+  }
+
+  /* Prevent 01 title row from eating too much height */
+  .kgen-panel-title-row {
+    flex: 0 0 22px !important;
+    min-height: 22px !important;
+    margin-bottom: 5px !important;
+  }
+}

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import "./ClinicalPhysiologyPage.css";
+import { connectFirelyStream } from "../services/firelyStream";
+
 
 const MAX_POINTS = 360;
 const CURRENT_MARK_RATIO = 0.47;
@@ -134,6 +136,119 @@ function buildSeries(factory) {
   return Array.from({ length: MAX_POINTS }, (_, index) => factory(index));
 }
 
+const DEFAULT_ALERT_INTERPRETATION = {
+  title: "(!) Critical abnormalities detected",
+  rhythm:
+    "Sinus rhythm with peaked T waves progressing to QRS widening, sine-wave morphology with loss of P waves, agonal complexes, and ventricular fibrillation.",
+  ppg:
+    "Normal pulsatile waveform with dicrotic notch, degrading amplitude, lasting to ventricular fibrillation onset.",
+  likelyEtiology:
+    "Hyperkalemic arrest in a patient on spironolactone with history of intermittent hyperkalemia, possibly precipitated by drug interaction, drug overdose, or recent renal impairment during K+ to lethal levels."
+};
+
+function appendOne(series, value, max = 8) {
+  if (value === undefined || value === null || Number.isNaN(Number(value))) {
+    return series;
+  }
+
+  return [...series, Number(value)].slice(-max);
+}
+
+function normalizeColor(color, fallback = "blue") {
+  if (color === "red" || color === "yellow" || color === "blue") {
+    return color;
+  }
+
+  return fallback;
+}
+
+function statusFromColor(color) {
+  if (color === "red") return "High/Critical";
+  if (color === "yellow") return "Warning";
+  return "Stable";
+}
+
+function formatStreamDate(timestamp) {
+  if (!timestamp) return "07/16/25";
+
+  const date = new Date(timestamp);
+
+  if (Number.isNaN(date.getTime())) {
+    return "07/16/25";
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "2-digit"
+  }).format(date);
+}
+
+function mergeFirelyFrameIntoLive(prev, frame) {
+  if (!frame) return prev;
+
+  if (frame.status === "error" || frame.error) {
+    return {
+      ...prev,
+      firelyStatus: "error",
+      alertColor: "yellow",
+      alertInterpretation: frame.interpretation || {
+        title: "Firely stream warning",
+        rhythm: "The dashboard could not fetch the latest Firely Observations.",
+        ppg: "Local waveform simulation is still running.",
+        likelyEtiology: "Check whether the FastAPI backend is running on port 8000."
+      }
+    };
+  }
+
+  const vitals = frame.vitals || {};
+  const labs = frame.labs || {};
+  const colors = frame.colors || {};
+
+  const next = {
+    ...prev,
+    firelyStatus: frame.status || "connected",
+    firelySource: frame.source || "firely-public-sandbox",
+    streamTimestamp: frame.timestamp || frame.receivedAt,
+    fallbackUsed: frame.fallbackUsed || [],
+
+    alertColor: normalizeColor(frame.overallColor || frame.color, prev.alertColor || "red"),
+    alertInterpretation: frame.interpretation || prev.alertInterpretation,
+
+    colors: {
+      ...prev.colors,
+      ...colors
+    },
+
+    heartRate: vitals.heartRate ?? prev.heartRate,
+    respiratoryRate: vitals.respiratoryRate ?? prev.respiratoryRate,
+    spo2: vitals.spo2 ?? prev.spo2,
+    systolic: vitals.systolic ?? prev.systolic,
+    diastolic: vitals.diastolic ?? prev.diastolic,
+    temperature: vitals.temperature ?? prev.temperature,
+
+    glucose: labs.glucose ?? prev.glucose,
+    potassium: labs.potassium ?? prev.potassium,
+    creatinine: labs.creatinine ?? prev.creatinine,
+    wbc: labs.wbc ?? prev.wbc
+  };
+
+  return {
+    ...next,
+    heartTrend: appendOne(prev.heartTrend, next.heartRate),
+    respTrend: appendOne(prev.respTrend, next.respiratoryRate),
+    spo2Trend: appendOne(prev.spo2Trend, next.spo2),
+    glucoseTrend: appendOne(prev.glucoseTrend, next.glucose),
+    potassiumTrend: appendOne(prev.potassiumTrend, next.potassium),
+    creatinineTrend: appendOne(prev.creatinineTrend, next.creatinine),
+    wbcTrend: appendOne(prev.wbcTrend, next.wbc)
+  };
+}
+
+function getLiveColor(live, field, fallback = "blue") {
+  return normalizeColor(live.colors?.[field], fallback);
+}
+
 function createInitialLiveState() {
   return {
     tick: 0,
@@ -158,59 +273,119 @@ function createInitialLiveState() {
     glucoseTrend: [125, 139, 141, 205, 225],
     potassiumTrend: [3.9, 4.2, 4.6, 5.1, 5.4],
     creatinineTrend: [0.89, 0.96, 1.05, 1.23, 1.42],
-    wbcTrend: [8.2, 9.1, 10.4, 11.2, 12.1]
+    wbcTrend: [8.2, 9.1, 10.4, 11.2, 12.1],
+    firelyStatus: "local",
+firelySource: "local-simulation",
+streamTimestamp: null,
+fallbackUsed: [],
+alertColor: "red",
+alertInterpretation: DEFAULT_ALERT_INTERPRETATION,
+colors: {
+  heartRate: "red",
+  respiratoryRate: "yellow",
+  spo2: "blue",
+  systolic: "blue",
+  diastolic: "blue",
+  temperature: "yellow",
+  glucose: "red",
+  potassium: "red",
+  creatinine: "red",
+  wbc: "red"
+}
   };
 }
 
 function nextLiveState(prev) {
   const tick = prev.tick + 1;
-  const nextIndexes = [tick * 4, tick * 4 + 1, tick * 4 + 2, tick * 4 + 3];
+  const usingFirely = prev.firelyStatus === "connected";
 
-  const heartRate = Math.round(
+  const simulatedHeartRate = Math.round(
     clamp(160 + Math.sin(tick / 4) * 7 + Math.sin(tick / 11) * 4, 146, 174)
   );
 
-  const respiratoryRate = Math.round(
+  const simulatedRespiratoryRate = Math.round(
     clamp(35 + Math.sin(tick / 5) * 3 + Math.sin(tick / 13) * 2, 29, 40)
   );
 
-  const spo2 = Math.round(clamp(98.5 + Math.sin(tick / 7) * 1.2, 96, 100));
+  const simulatedSpo2 = Math.round(
+    clamp(98.5 + Math.sin(tick / 7) * 1.2, 96, 100)
+  );
 
-  const systolic = Math.round(clamp(130 + Math.sin(tick / 8) * 4, 124, 138));
-  const diastolic = Math.round(clamp(85 + Math.sin(tick / 9) * 3, 80, 90));
-  const temperature = Number(clamp(37.2 + Math.sin(tick / 10) * 0.15, 37.0, 37.5).toFixed(1));
+  const simulatedSystolic = Math.round(
+    clamp(130 + Math.sin(tick / 8) * 4, 124, 138)
+  );
 
-  const glucose = Math.round(clamp(225 + Math.sin(tick / 6) * 9, 214, 238));
-  const potassium = Number(clamp(5.4 + Math.sin(tick / 8) * 0.15, 5.2, 5.7).toFixed(1));
-  const creatinine = Number(clamp(1.42 + Math.sin(tick / 9) * 0.06, 1.34, 1.52).toFixed(2));
-  const wbc = Number(clamp(12.1 + Math.sin(tick / 7) * 0.5, 11.4, 12.9).toFixed(1));
+  const simulatedDiastolic = Math.round(
+    clamp(85 + Math.sin(tick / 9) * 3, 80, 90)
+  );
+
+  const simulatedTemperature = Number(
+    clamp(37.2 + Math.sin(tick / 10) * 0.15, 37.0, 37.5).toFixed(1)
+  );
+
+  const simulatedGlucose = Math.round(
+    clamp(225 + Math.sin(tick / 6) * 9, 214, 238)
+  );
+
+  const simulatedPotassium = Number(
+    clamp(5.4 + Math.sin(tick / 8) * 0.15, 5.2, 5.7).toFixed(1)
+  );
+
+  const simulatedCreatinine = Number(
+    clamp(1.42 + Math.sin(tick / 9) * 0.06, 1.34, 1.52).toFixed(2)
+  );
+
+  const simulatedWbc = Number(
+    clamp(12.1 + Math.sin(tick / 7) * 0.5, 11.4, 12.9).toFixed(1)
+  );
+
+  const heartRate = usingFirely ? prev.heartRate : simulatedHeartRate;
+  const respiratoryRate = usingFirely ? prev.respiratoryRate : simulatedRespiratoryRate;
+  const spo2 = usingFirely ? prev.spo2 : simulatedSpo2;
+  const systolic = usingFirely ? prev.systolic : simulatedSystolic;
+  const diastolic = usingFirely ? prev.diastolic : simulatedDiastolic;
+  const temperature = usingFirely ? prev.temperature : simulatedTemperature;
+  const glucose = usingFirely ? prev.glucose : simulatedGlucose;
+  const potassium = usingFirely ? prev.potassium : simulatedPotassium;
+  const creatinine = usingFirely ? prev.creatinine : simulatedCreatinine;
+  const wbc = usingFirely ? prev.wbc : simulatedWbc;
+
+  const nextState = {
+    ...prev,
+    tick,
+    clockText: formatLiveClock(),
+
+    heartRate,
+    respiratoryRate,
+    spo2,
+    systolic,
+    diastolic,
+    temperature,
+    glucose,
+    potassium,
+    creatinine,
+    wbc,
+
+    ecg: buildStrip(ecgValue, tick),
+    resp: buildStrip(redRhythmValue, tick),
+    ppg: buildStrip((index, currentTick) => ppgValue(index, currentTick, false), tick),
+    ppgSoft: buildStrip((index, currentTick) => ppgValue(index, currentTick, true), tick)
+  };
+
+  if (usingFirely) {
+    return nextState;
+  }
 
   return {
-  ...prev,
-  tick,
-  clockText: formatLiveClock(),
-  heartRate,
-  respiratoryRate,
-  spo2,
-  systolic,
-  diastolic,
-  temperature,
-  glucose,
-  potassium,
-  creatinine,
-  wbc,
-  ecg: buildStrip(ecgValue, tick),
-  resp: buildStrip(redRhythmValue, tick),
-  ppg: buildStrip((index, currentTick) => ppgValue(index, currentTick, false), tick),
-  ppgSoft: buildStrip((index, currentTick) => ppgValue(index, currentTick, true), tick),
-  heartTrend: appendValues(prev.heartTrend, [heartRate]).slice(-8),
-  respTrend: appendValues(prev.respTrend, [respiratoryRate]).slice(-8),
-  spo2Trend: appendValues(prev.spo2Trend, [spo2]).slice(-8),
-  glucoseTrend: appendValues(prev.glucoseTrend, [glucose]).slice(-8),
-  potassiumTrend: appendValues(prev.potassiumTrend, [potassium]).slice(-8),
-  creatinineTrend: appendValues(prev.creatinineTrend, [creatinine]).slice(-8),
-  wbcTrend: appendValues(prev.wbcTrend, [wbc]).slice(-8)
-};
+    ...nextState,
+    heartTrend: appendValues(prev.heartTrend, [heartRate]).slice(-8),
+    respTrend: appendValues(prev.respTrend, [respiratoryRate]).slice(-8),
+    spo2Trend: appendValues(prev.spo2Trend, [spo2]).slice(-8),
+    glucoseTrend: appendValues(prev.glucoseTrend, [glucose]).slice(-8),
+    potassiumTrend: appendValues(prev.potassiumTrend, [potassium]).slice(-8),
+    creatinineTrend: appendValues(prev.creatinineTrend, [creatinine]).slice(-8),
+    wbcTrend: appendValues(prev.wbcTrend, [wbc]).slice(-8)
+  };
 }
 
 function toPolylineNormalized(values, width, height, padding = 6) {
@@ -305,13 +480,24 @@ function MiniTrend({ values, color = "red", onOpen, ariaLabel }) {
   );
 }
 
-function LabTile({ name, value, status, meta, trend, onOpenTrend }) {
-  const [firstDate, secondDate] = String(meta).split(" ");
+function LabTile({
+  name,
+  value,
+  status,
+  meta,
+  trend,
+  color = "red",
+  onOpenTrend
+}) {
+  const [firstDate = "06/23", secondDate = "07/18"] = String(
+    meta || "06/23 07/18"
+  ).split(" ");
 
   return (
-    <article className="kgen-lab-tile">
+    <article className={`kgen-lab-tile ${color}`}>
       <div className="kgen-lab-title">
         <span>{name}</span>
+
         <button
           type="button"
           aria-label={`Open ${name} lab trend`}
@@ -322,23 +508,28 @@ function LabTile({ name, value, status, meta, trend, onOpenTrend }) {
       </div>
 
       <div className="kgen-lab-value-row">
-        <strong>{value}</strong>
-        <MiniTrend
-          values={trend}
-          onOpen={onOpenTrend}
-          ariaLabel={`Open ${name} trend popup`}
-        />
-      </div>
+        <div className="kgen-lab-reading">
+          <strong>{value}</strong>
+          <small>{status}</small>
+        </div>
 
-      <div className="kgen-lab-meta-line">
-        <small>{status}</small>
-        <em>{firstDate}</em>
-        {secondDate && <em>{secondDate}</em>}
+        <div className="kgen-lab-spark-wrap">
+          <MiniTrend
+            values={trend}
+            color={color}
+            onOpen={onOpenTrend}
+            ariaLabel={`Open ${name} trend popup`}
+          />
+
+          <div className="kgen-lab-spark-dates">
+            <span>{firstDate}</span>
+            <span>{secondDate}</span>
+          </div>
+        </div>
       </div>
     </article>
   );
 }
-
 function WaveformOverlay({ config, onClose }) {
   useEffect(() => {
     function handleKeyDown(event) {
@@ -450,6 +641,38 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const disconnect = connectFirelyStream({
+      onFrame: (frame) => {
+        setLive((prev) => mergeFirelyFrameIntoLive(prev, frame));
+      },
+      onHeartbeat: () => {
+        setLive((prev) => ({
+          ...prev,
+          firelyStatus:
+            prev.firelyStatus === "local" ? "connecting" : prev.firelyStatus
+        }));
+      },
+      onError: () => {
+        setLive((prev) => ({
+          ...prev,
+          firelyStatus: "error",
+          alertColor: "yellow",
+          alertInterpretation: {
+            title: "Firely stream warning",
+            rhythm:
+              "The dashboard could not receive the latest Firely stream frame.",
+            ppg: "Local waveform simulation is still running.",
+            likelyEtiology:
+              "Check whether FastAPI is running on http://localhost:8000."
+          }
+        }));
+      }
+    });
+
+    return disconnect;
+  }, []);
+
   const currentPatient = useMemo(() => {
     if (!patient) return BASE_PATIENT;
 
@@ -461,54 +684,60 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
     };
   }, [patient]);
 
-  const labCards = useMemo(
-    () => [
-      {
-        name: "Glucose",
-        value: live.glucose,
-        status: "High/Critical",
-        meta: "",
-        trend: live.glucoseTrend
-      },
-      {
-        name: "Potassium",
-        value: live.potassium.toFixed(1),
-        status: "High/Critical",
-        meta: "",
-        trend: live.potassiumTrend
-      },
-      {
-        name: "Creatinine",
-        value: live.creatinine.toFixed(2),
-        status: "High/Critical",
-        meta: "",
-        trend: live.creatinineTrend
-      },
-      {
-        name: "WBC",
-        value: live.wbc.toFixed(1),
-        status: "High",
-        meta: "",
-        trend: live.wbcTrend
-      }
-    ],
-    [
-      live.glucose,
-      live.potassium,
-      live.creatinine,
-      live.wbc,
-      live.glucoseTrend,
-      live.potassiumTrend,
-      live.creatinineTrend,
-      live.wbcTrend
-    ]
-  );
+const labCards = useMemo(
+  () => [
+    {
+      name: "Glucose",
+      value: live.glucose,
+      status: statusFromColor(getLiveColor(live, "glucose", "red")),
+      meta: "06/23 07/18",
+      trend: live.glucoseTrend,
+      color: getLiveColor(live, "glucose", "red")
+    },
+    {
+      name: "Potassium",
+      value: Number(live.potassium).toFixed(1),
+      status: statusFromColor(getLiveColor(live, "potassium", "red")),
+      meta: "06/23 07/18",
+      trend: live.potassiumTrend,
+      color: getLiveColor(live, "potassium", "red")
+    },
+    {
+      name: "Creatinine",
+      value: Number(live.creatinine).toFixed(2),
+      status: statusFromColor(getLiveColor(live, "creatinine", "red")),
+      meta: "06/23 07/18",
+      trend: live.creatinineTrend,
+      color: getLiveColor(live, "creatinine", "red")
+    },
+    {
+      name: "WBC",
+      value: Number(live.wbc).toFixed(1),
+      status: statusFromColor(getLiveColor(live, "wbc", "red")),
+      meta: "06/23 07/18",
+      trend: live.wbcTrend,
+      color: getLiveColor(live, "wbc", "red")
+    }
+  ],
+  [
+    live.glucose,
+    live.potassium,
+    live.creatinine,
+    live.wbc,
+    live.glucoseTrend,
+    live.potassiumTrend,
+    live.creatinineTrend,
+    live.wbcTrend,
+    live.colors
+  ]
+);
+const streamDate = formatStreamDate(live.streamTimestamp);
 
-  const vitalRows = [
-    ["BP", `${live.systolic}/${live.diastolic}`, "mmHg", "07/16/25"],
-    ["SpO2", live.spo2, "%", "07/16/25"],
-    ["Oral Temperature", live.temperature.toFixed(1), "°C", "07/10/25"]
-  ];
+const vitalRows = [
+  ["BP", `${live.systolic}/${live.diastolic}`, "mmHg", streamDate],
+  ["SpO2", live.spo2, "%", streamDate],
+  ["Oral Temperature", Number(live.temperature).toFixed(1), "°C", streamDate]
+];
 
   const waveformOverlay = useMemo(() => {
     if (!activeWaveformId) return null;
@@ -518,20 +747,20 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
         section: "01. Live Physiology",
         title: "ECG waveform",
         subtitle: `${currentPatient.name} • Hyperkalemic rhythm progression`,
-        color: "red",
         scaleMode: "normalized",
         values: live.ecg,
         currentValue: live.heartRate,
         unit: " bpm",
         status: "Critical",
         footerLeft: "0s",
-        footerRight: "16s"
+        footerRight: "16s",
+         color: getLiveColor(live, "heartRate", live.alertColor || "red")
       },
       resp: {
         section: "01. Live Physiology",
         title: "Respiratory rhythm waveform",
         subtitle: `${currentPatient.name} • Respiratory waveform strip`,
-        color: "red",
+       color: getLiveColor(live, "respiratoryRate", "yellow"),
         scaleMode: "normalized",
         values: live.resp,
         currentValue: live.respiratoryRate,
@@ -544,7 +773,7 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
         section: "01. Live Physiology",
         title: "PPG waveform",
         subtitle: `${currentPatient.name} • Pulse plethysmography signal`,
-        color: "blue",
+        color: getLiveColor(live, "spo2", "blue"),
         scaleMode: "normalized",
         values: live.ppg,
         currentValue: live.spo2,
@@ -557,7 +786,7 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
         section: "01. Live Physiology",
         title: "Secondary PPG waveform",
         subtitle: `${currentPatient.name} • Low amplitude pulse trend`,
-        color: "blue",
+        color: getLiveColor(live, "spo2", "blue"),
         scaleMode: "normalized",
         values: live.ppgSoft,
         currentValue: live.spo2,
@@ -570,7 +799,7 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
         section: "01. Live Physiology",
         title: "Heart rate trend",
         subtitle: `${currentPatient.name} • Live heart rate mini trend`,
-        color: "red",
+        color: getLiveColor(live, "heartRate", "red"),
         scaleMode: "scaled",
         values: live.heartTrend,
         currentValue: live.heartRate,
@@ -584,7 +813,7 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
         section: "01. Live Physiology",
         title: "Respiratory rate trend",
         subtitle: `${currentPatient.name} • Live respiratory trend`,
-        color: "blue",
+          color: getLiveColor(live, "respiratoryRate", "yellow"),
         scaleMode: "scaled",
         values: live.respTrend,
         currentValue: live.respiratoryRate,
@@ -598,7 +827,7 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
         section: "01. Live Physiology",
         title: "SpO2 trend",
         subtitle: `${currentPatient.name} • Oxygen saturation trend`,
-        color: "blue",
+         color: getLiveColor(live, "spo2", "blue"),
         scaleMode: "scaled",
         values: live.spo2Trend,
         currentValue: live.spo2,
@@ -616,6 +845,9 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
 
     const labName = activeWaveformId.replace("lab-", "");
     const selectedLab = labCards.find((item) => item.name === labName);
+    
+  
+
 
     if (!selectedLab) return null;
 
@@ -623,7 +855,7 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
       section: "03. Recent Lab Results & Trends",
       title: `${selectedLab.name} trend`,
       subtitle: `${currentPatient.name} • Lab trend over recent draws`,
-      color: "red",
+      color: selectedLab.color || "red",
       scaleMode: "scaled",
       values: selectedLab.trend,
       currentValue: selectedLab.value,
@@ -641,6 +873,11 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
       footerRight: "07/18"
     };
   }, [activeWaveformId, currentPatient.name, live, labCards]);
+
+const interpretation =
+  live.alertInterpretation || DEFAULT_ALERT_INTERPRETATION;
+
+const alertColor = normalizeColor(live.alertColor, "red");
 
 
   return (
@@ -676,16 +913,16 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
 
           <div className="kgen-live-content">
             <div className="kgen-wave-stack">
-              <WaveChart
-  label="ECG (RED)"
-  color="red"
+<WaveChart
+  label="ECG"
+  color={getLiveColor(live, "heartRate", live.alertColor || "red")}
   values={live.ecg}
   onOpen={() => setActiveWaveformId("ecg")}
   ariaLabel="Open ECG waveform popup"
 />
 
 <WaveChart
-  color="red"
+  color={getLiveColor(live, "respiratoryRate", "yellow")}
   values={live.resp}
   compact
   onOpen={() => setActiveWaveformId("resp")}
@@ -693,15 +930,15 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
 />
 
 <WaveChart
-  label="PPG (BLUE)"
-  color="blue"
+  label="PPG"
+  color={getLiveColor(live, "spo2", "blue")}
   values={live.ppg}
   onOpen={() => setActiveWaveformId("ppg")}
   ariaLabel="Open PPG waveform popup"
 />
 
 <WaveChart
-  color="blue"
+  color={getLiveColor(live, "spo2", "blue")}
   values={live.ppgSoft}
   compact
   onOpen={() => setActiveWaveformId("ppgSoft")}
@@ -723,6 +960,7 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
                 <span>Heart Rate</span>
                 <strong>{live.heartRate}</strong>
               <MiniTrend
+  color={getLiveColor(live, "heartRate", "red")}
   values={live.heartTrend}
   onOpen={() => setActiveWaveformId("heartTrend")}
   ariaLabel="Open heart rate trend popup"
@@ -733,7 +971,7 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
                 <span>Respiratory Rate</span>
                 <strong className="blue">{live.respiratoryRate}</strong>
          <MiniTrend
-  color="blue"
+  color={getLiveColor(live, "respiratoryRate", "yellow")}
   values={live.respTrend}
   onOpen={() => setActiveWaveformId("respTrend")}
   ariaLabel="Open respiratory rate trend popup"
@@ -744,7 +982,7 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
                 <span>SpO2</span>
                 <strong className="blue">{live.spo2}%</strong>
                 <MiniTrend
-  color="blue"
+  color={getLiveColor(live, "spo2", "blue")}
   values={live.spo2Trend}
   onOpen={() => setActiveWaveformId("spo2Trend")}
   ariaLabel="Open SpO2 trend popup"
@@ -789,32 +1027,29 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
           </button>
         </section>
 
-        <section className="kgen-panel kgen-alert-panel">
-          <h2>02. Critical Alerts &amp; Interpretation</h2>
+        <section className={`kgen-panel kgen-alert-panel ${alertColor}`}>
+  <h2>02. Critical Alerts &amp; Interpretation</h2>
 
-          <div className="kgen-alert-box">
-            <div className="kgen-alert-icon">!</div>
+  <div className="kgen-alert-box">
+    <div className="kgen-alert-icon">
+      {alertColor === "blue" ? "✓" : "!"}
+    </div>
 
-            <h3>(!) Critical abnormalities detected</h3>
+    <h3>{interpretation.title}</h3>
 
-            <p>
-              <b>Rhythm:</b> Sinus rhythm with peaked T waves progressing to CRS widening,
-              sine wave morphology with loss of P waves, widening, sine-wave morphology with
-              loss of P waves, agonal complexes, and ventricular fibrillation.
-            </p>
+    <p>
+      <b>Rhythm:</b> {interpretation.rhythm}
+    </p>
 
-            <p>
-              <b>PPG Signal:</b> Normal pulsatile waveform with dicrotic notch, degrading
-              amplitude, lasting to sore at ventricular fibrillation onset.
-            </p>
+    <p>
+      <b>PPG Signal:</b> {interpretation.ppg}
+    </p>
 
-            <p>
-              <b>Likely Etiology:</b> Hyperkalemic arrest in a patient on spironolactone with
-              history of intermittent hyperkalemia, possibly precipitated by drug interaction,
-              drug overdose, or recent renal impairment during K+ to lethal levels.
-            </p>
-          </div>
-        </section>
+    <p>
+      <b>Likely Etiology:</b> {interpretation.likelyEtiology}
+    </p>
+  </div>
+</section>
 
         <section className="kgen-panel kgen-labs-small-panel">
           <h2>03. Recent Lab Results &amp; Trends</h2>
