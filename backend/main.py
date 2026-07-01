@@ -1,7 +1,7 @@
 import asyncio
 import json
 from typing import Any
-
+import hashlib
 from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -90,32 +90,32 @@ async def oracle_session_debug(request: Request):
 
 
 
-@app.get("/api/firely/raw")
-async def raw_firely_observations(patient_id: str | None = Query(default=None)):
-    return await fetch_provider_observations("firely", patient_id)
+# @app.get("/api/firely/raw")
+# async def raw_firely_observations(patient_id: str | None = Query(default=None)):
+#     return await fetch_provider_observations("firely", patient_id)
 
 
-@app.get("/api/firely/latest")
-async def latest_firely_frame(
-    patient_id: str | None = Query(default=None),
-    debug: bool = Query(default=False),
-):
-    bundle = await fetch_provider_observations("firely", patient_id)
-    return to_dashboard_frame(
-        bundle,
-        provider="firely-public-sandbox",
-        include_debug=debug,
-    )
+# @app.get("/api/firely/latest")
+# async def latest_firely_frame(
+#     patient_id: str | None = Query(default=None),
+#     debug: bool = Query(default=False),
+# ):
+#     bundle = await fetch_provider_observations("firely", patient_id)
+#     return to_dashboard_frame(
+#         bundle,
+#         provider="firely-public-sandbox",
+#         include_debug=debug,
+#     )
 
 
-@app.get("/api/firely/debug/latest")
-async def latest_firely_debug_frame(patient_id: str | None = Query(default=None)):
-    bundle = await fetch_provider_observations("firely", patient_id)
-    return to_dashboard_frame(
-        bundle,
-        provider="firely-public-sandbox",
-        include_debug=True,
-    )
+# @app.get("/api/firely/debug/latest")
+# async def latest_firely_debug_frame(patient_id: str | None = Query(default=None)):
+#     bundle = await fetch_provider_observations("firely", patient_id)
+#     return to_dashboard_frame(
+#         bundle,
+#         provider="firely-public-sandbox",
+#         include_debug=True,
+#     )
 
 
 @app.get("/api/fhir/latest")
@@ -158,32 +158,63 @@ async def latest_fhir_frame(
     )
 
 
+# @app.get("/api/firely/stream")
+# async def stream_firely_frame(
+#     request: Request,
+#     patient_id: str | None = Query(default=None),
+#     debug: bool = Query(default=False),
+# ):
+#     # Old Firely route kept for compatibility.
+#     return make_streaming_response(
+#         request=request,
+#         provider="firely",
+#         patient_id=patient_id,
+#         debug=debug,
+#     )
+
+@app.get("/api/firely/raw")
+async def raw_firely_observations():
+    return {
+        "ok": False,
+        "message": "Firely is disabled. Use Oracle via /api/stream or /api/fhir/latest?provider=oracle."
+    }
+
+
+@app.get("/api/firely/latest")
+async def latest_firely_frame():
+    return {
+        "ok": False,
+        "message": "Firely is disabled. Use Oracle via /api/fhir/latest?provider=oracle."
+    }
+
+
+@app.get("/api/firely/debug/latest")
+async def latest_firely_debug_frame():
+    return {
+        "ok": False,
+        "message": "Firely is disabled. Use Oracle via /api/fhir/latest?provider=oracle&debug=true."
+    }
+
+
 @app.get("/api/firely/stream")
-async def stream_firely_frame(
-    request: Request,
-    patient_id: str | None = Query(default=None),
-    debug: bool = Query(default=False),
-):
-    # Old Firely route kept for compatibility.
-    return make_streaming_response(
-        request=request,
-        provider="firely",
-        patient_id=patient_id,
-        debug=debug,
-    )
-
-
+async def stream_firely_frame():
+    return {
+        "ok": False,
+        "message": "Firely is disabled. Use Oracle via /api/stream?debug=true."
+    }
+    
+    
+    
+    
 @app.get("/api/stream")
 async def stream_fhir_frame(
     request: Request,
-    provider: str = Query(default=settings.FHIR_PROVIDER),
-    patient_id: str | None = Query(default=None),
     debug: bool = Query(default=False),
 ):
     return make_streaming_response(
         request=request,
-        provider=provider,
-        patient_id=patient_id,
+        provider="oracle",
+        patient_id=None,
         debug=debug,
     )
 
@@ -197,6 +228,7 @@ def make_streaming_response(
 ):
     async def event_generator():
         last_payload = None
+        last_oracle_hash = None
 
         while True:
             try:
@@ -231,7 +263,33 @@ def make_streaming_response(
                     include_debug=debug,
                     medication_resources=medication_resources,
                 )
+                
+                oracle_values = frame.get("debug", {}).get("rawExtractedFhirValues") or {
+                "vitals": frame.get("vitals"),
+                "labs": frame.get("labs"),
+            }
 
+                oracle_hash = hashlib.sha256(
+                    json.dumps(oracle_values, sort_keys=True).encode("utf-8")
+                ).hexdigest()[:10]
+
+                oracle_changed = oracle_hash != last_oracle_hash
+                last_oracle_hash = oracle_hash
+
+                quality = frame.get("dataQuality", {})
+
+                print(
+                    "[KGEN ORACLE SSE]",
+                    f"provider={provider_label(provider)}",
+                    f"patient={effective_patient_id}",
+                    f"receivedAt={frame.get('receivedAt')}",
+                    f"fhirFields={quality.get('fhirFields')}",
+                    f"fallbackFields={quality.get('fallbackFields')}",
+                    f"observationCount={quality.get('observationCount')}",
+                    f"matchedObservationCount={quality.get('matchedObservationCount')}",
+                    f"oracleHash={oracle_hash}",
+                    f"oracleChanged={oracle_changed}",
+                )
                 payload = json.dumps(frame, separators=(",", ":"))
 
                 if payload != last_payload:

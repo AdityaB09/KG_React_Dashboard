@@ -60,6 +60,32 @@ def round_if_present(value: float | None, decimals: int = 0) -> float | int | No
         return int(round(value))
     return round(value, decimals)
 
+def clinically_plausible(field: str, value: float | int | None, unit: str | None = None) -> bool:
+    if value is None:
+        return False
+
+    try:
+        value = float(value)
+    except (TypeError, ValueError):
+        return False
+
+    ranges = {
+        "heartRate": (20, 250),
+        "respiratoryRate": (4, 80),
+        "spo2": (50, 100),
+        "systolic": (50, 260),
+        "diastolic": (30, 160),
+        "temperature": (30, 45),
+        "glucose": (20, 700),
+        "potassium": (1.5, 9.0),
+        "creatinine": (0.1, 20.0),
+        "wbc": (0.1, 100.0),
+    }
+
+    low, high = ranges.get(field, (-999999, 999999))
+    return low <= value <= high
+
+
 
 def get_codes(codeable: dict[str, Any] | None) -> set[str]:
     if not codeable:
@@ -233,7 +259,7 @@ def extract_dashboard_values(
                 quantity_value = get_quantity_value(obs)
                 unit = get_quantity_unit(obs)
 
-                if quantity_value is not None:
+                if quantity_value is not None and clinically_plausible(field, quantity_value, unit):
                     values[field] = quantity_value
 
                     if timestamp:
@@ -260,7 +286,7 @@ def extract_dashboard_values(
                 LOINC["systolic"],
             )
 
-            if systolic is not None:
+            if systolic is not None and clinically_plausible("systolic", systolic, systolic_unit):
                 values["systolic"] = systolic
                 if timestamp:
                     timestamps["systolic"] = timestamp
@@ -288,7 +314,7 @@ def extract_dashboard_values(
                 LOINC["diastolic"],
             )
 
-            if diastolic is not None:
+            if diastolic is not None and clinically_plausible("diastolic", diastolic, diastolic_unit):
                 values["diastolic"] = diastolic
                 if timestamp:
                     timestamps["diastolic"] = timestamp

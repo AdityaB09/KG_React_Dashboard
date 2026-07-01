@@ -1144,8 +1144,8 @@ const alertColor = normalizeColor(live.alertColor, "red");
             </thead>
 
             <tbody>
-              {(live.medicationRows?.length ? live.medicationRows : MEDICATION_ROWS).map((row) => (
-                <tr key={row.med}>
+             {(live.medicationRows?.length ? live.medicationRows : MEDICATION_ROWS).map((row, index) => (
+                <tr key={`${row.sourceResource || "med"}-${row.id || row.med || row.name || "row"}-${row.date || row.prescribed || ""}-${index}`}>
                   <td>
                     <strong>{row.med}</strong>
                     {row.sub && <small>{row.sub}</small>}

@@ -191,19 +191,13 @@ async def fetch_provider_observations(
     access_token: str | None = None,
     fhir_base_url: str | None = None,
 ) -> dict[str, Any]:
-    provider = provider.lower()
+    return await fetch_oracle_observations(
+        patient_id,
+        access_token=access_token,
+        fhir_base_url=fhir_base_url,
+    )
 
-    if provider == "firely":
-        return await fetch_firely_observations(patient_id)
 
-    if provider == "oracle":
-        return await fetch_oracle_observations(
-            patient_id,
-            access_token=access_token,
-            fhir_base_url=fhir_base_url,
-        )
-
-    raise HTTPException(status_code=400, detail=f"Unsupported provider: {provider}")
 
 
 async def fetch_provider_medications(
@@ -216,31 +210,24 @@ async def fetch_provider_medications(
     if not patient_id:
         return []
 
-    if provider == "firely":
-        return []
+    resources: list[dict[str, Any]] = []
 
-    if provider == "oracle":
-        resources: list[dict[str, Any]] = []
-
-        for resource_type in [
-            "MedicationRequest",
-            "MedicationAdministration",
-            "MedicationDispense",
-        ]:
-            resources.extend(
-                await fetch_oracle_patient_resources(
-                    resource_type,
-                    patient_id,
-                    access_token=access_token,
-                    fhir_base_url=fhir_base_url,
-                    count=25,
-                )
+    for resource_type in [
+        "MedicationRequest",
+        "MedicationAdministration",
+        "MedicationDispense",
+    ]:
+        resources.extend(
+            await fetch_oracle_patient_resources(
+                resource_type,
+                patient_id,
+                access_token=access_token,
+                fhir_base_url=fhir_base_url,
+                count=25,
             )
+        )
 
-        return resources
-
-    return []
-
+    return resources
 
 async def test_provider_status(
     provider: str,
