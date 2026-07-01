@@ -650,7 +650,7 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
   }, []);
 
 useEffect(() => {
-  const provider = import.meta.env.VITE_FHIR_PROVIDER || "firely";
+  const provider = "oracle";
 
   console.log("[KGEN FHIR STREAM CONFIG]", {
   provider,
@@ -658,17 +658,26 @@ useEffect(() => {
   envPatientId: import.meta.env.VITE_FHIR_PATIENT_ID
 });
 
-  const streamPatientId =
-    provider === "oracle"
-      ? import.meta.env.VITE_FHIR_PATIENT_ID || ""
-      : import.meta.env.VITE_FHIR_PATIENT_ID || patient?.fhirId || patient?.id;
+  const streamPatientId = "";
 
   const disconnect = connectFhirStream({
     provider,
     patientId: streamPatientId,
     onFrame: (frame) => {
-      setLive((prev) => mergeFirelyFrameIntoLive(prev, frame));
-    },
+  console.log("[KGEN PAGE FRAME RECEIVED]", {
+    source: frame.source,
+    status: frame.status,
+    receivedAt: frame.receivedAt,
+    fhirFields: frame.dataQuality?.fhirFields,
+    fallbackFields: frame.dataQuality?.fallbackFields,
+    observationCount: frame.dataQuality?.observationCount,
+    matchedObservationCount: frame.dataQuality?.matchedObservationCount,
+    vitals: frame.vitals,
+    labs: frame.labs
+  });
+
+  setLive((prev) => mergeFirelyFrameIntoLive(prev, frame));
+},
     onHeartbeat: () => {
       setLive((prev) => ({
         ...prev,
@@ -1156,14 +1165,16 @@ const alertColor = normalizeColor(live.alertColor, "red");
                   </td>
 
                   <td>
-                    {row.taken.map((item) => (
-                      <div key={`${row.med}-${item.time}`}>
-                        <span className={item.ok ? "kgen-ok" : "kgen-no"}>
-                          {item.ok ? "✓" : "×"}
-                        </span>{" "}
-                        {item.time}
-                      </div>
-                    ))}
+                    {(row.taken || []).map((item, takenIndex) => (
+  <div
+    key={`${row.sourceResource || "med"}-${row.id || index}-taken-${item.time || "time"}-${takenIndex}`}
+  >
+    <span className={item.ok ? "kgen-ok" : "kgen-no"}>
+      {item.ok ? "✓" : "×"}
+    </span>{" "}
+    {item.time}
+  </div>
+))}
                   </td>
 
                   <td>{row.date}</td>

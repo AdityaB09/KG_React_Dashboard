@@ -1,4 +1,10 @@
 const DEFAULT_STREAM_URL = "http://127.0.0.1:8000/api/stream?debug=true";
+let activeEventSource = null;
+
+const DEBUG_SSE =
+  import.meta.env.DEV &&
+  import.meta.env.VITE_DEBUG_FHIR_STREAM === "true";
+
 
 function buildStreamUrl() {
   const baseUrl =
@@ -16,6 +22,7 @@ function buildStreamUrl() {
 }
 
 
+
 export function connectFhirStream({
   provider,
   patientId,
@@ -28,17 +35,27 @@ export function connectFhirStream({
     patientId: "",
   });
 
+  if (DEBUG_SSE) {
   console.log("[KGEN SSE CONNECT]", {
     streamUrl,
     provider: "oracle",
     patientId: ""
   });
+}
+  
+if (activeEventSource) {
+  activeEventSource.close();
+  activeEventSource = null;
+}
+ 
 
   const eventSource = new EventSource(streamUrl, {
     withCredentials: true,
   });
 
   let lastOracleHash = null;
+
+  activeEventSource = eventSource;
 
   function tinyHash(value) {
     const text = JSON.stringify(value ?? {});
@@ -65,7 +82,7 @@ export function connectFhirStream({
       const oracleHash = tinyHash(oracleValues);
       const oracleChanged = oracleHash !== lastOracleHash;
       lastOracleHash = oracleHash;
-
+if (DEBUG_SSE) {
       console.log("[KGEN SSE FRAME]", {
         source: frame.source,
         status: frame.status,
@@ -79,6 +96,7 @@ export function connectFhirStream({
         oracleHash,
         oracleChanged
       });
+    }
 
       onFrame?.(frame);
     } catch (error) {
@@ -92,11 +110,15 @@ export function connectFhirStream({
   eventSource.addEventListener("heartbeat", (event) => {
     try {
       const heartbeat = JSON.parse(event.data);
+    if (DEBUG_SSE) {
       console.log("[KGEN SSE HEARTBEAT]", heartbeat);
       onHeartbeat?.(heartbeat);
+    }
     } catch {
+      if (DEBUG_SSE) {
       console.log("[KGEN SSE HEARTBEAT]", { status: "heartbeat" });
       onHeartbeat?.({ status: "heartbeat" });
+      }
     }
   });
 
@@ -106,7 +128,15 @@ export function connectFhirStream({
   };
 
   return () => {
+  if (DEBUG_SSE) {
     console.log("[KGEN SSE CLOSE]");
-    eventSource.close();
-  };
+  }
+
+  if (activeEventSource === eventSource) {
+    activeEventSource = null;
+  }
+
+  eventSource.close();
+};
+
 }
