@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import "./ClinicalPhysiologyPage.css";
-import { connectFirelyStream } from "../services/firelyStream";
+import { connectFhirStream } from "../services/fhirStream";
 
 
 const MAX_POINTS = 360;
@@ -212,6 +212,12 @@ function mergeFirelyFrameIntoLive(prev, frame) {
     streamTimestamp: frame.timestamp || frame.receivedAt,
     fallbackUsed: frame.fallbackUsed || [],
 
+
+  priorityTrends: frame.priorityTrends || prev.priorityTrends || [],
+  medicationRows: frame.medicationRows || prev.medicationRows || MEDICATION_ROWS,
+  contextAlerts: frame.contextAlerts || prev.contextAlerts || [],
+
+
     alertColor: normalizeColor(frame.overallColor || frame.color, prev.alertColor || "red"),
     alertInterpretation: frame.interpretation || prev.alertInterpretation,
 
@@ -278,6 +284,8 @@ function createInitialLiveState() {
 firelySource: "local-simulation",
 streamTimestamp: null,
 fallbackUsed: [],
+priorityTrends: [],
+medicationRows: MEDICATION_ROWS,
 alertColor: "red",
 alertInterpretation: DEFAULT_ALERT_INTERPRETATION,
 colors: {
@@ -641,37 +649,50 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const disconnect = connectFirelyStream({
-      onFrame: (frame) => {
-        setLive((prev) => mergeFirelyFrameIntoLive(prev, frame));
-      },
-      onHeartbeat: () => {
-        setLive((prev) => ({
-          ...prev,
-          firelyStatus:
-            prev.firelyStatus === "local" ? "connecting" : prev.firelyStatus
-        }));
-      },
-      onError: () => {
-        setLive((prev) => ({
-          ...prev,
-          firelyStatus: "error",
-          alertColor: "yellow",
-          alertInterpretation: {
-            title: "Firely stream warning",
-            rhythm:
-              "The dashboard could not receive the latest Firely stream frame.",
-            ppg: "Local waveform simulation is still running.",
-            likelyEtiology:
-              "Check whether FastAPI is running on http://localhost:8000."
-          }
-        }));
-      }
-    });
+useEffect(() => {
+  const provider = import.meta.env.VITE_FHIR_PROVIDER || "firely";
 
-    return disconnect;
-  }, []);
+  console.log("[KGEN FHIR STREAM CONFIG]", {
+  provider,
+  streamUrl: import.meta.env.VITE_FHIR_STREAM_URL,
+  envPatientId: import.meta.env.VITE_FHIR_PATIENT_ID
+});
+
+  const streamPatientId =
+    provider === "oracle"
+      ? import.meta.env.VITE_FHIR_PATIENT_ID || ""
+      : import.meta.env.VITE_FHIR_PATIENT_ID || patient?.fhirId || patient?.id;
+
+  const disconnect = connectFhirStream({
+    provider,
+    patientId: streamPatientId,
+    onFrame: (frame) => {
+      setLive((prev) => mergeFirelyFrameIntoLive(prev, frame));
+    },
+    onHeartbeat: () => {
+      setLive((prev) => ({
+        ...prev,
+        firelyStatus:
+          prev.firelyStatus === "local" ? "connecting" : prev.firelyStatus
+      }));
+    },
+    onError: () => {
+      setLive((prev) => ({
+        ...prev,
+        firelyStatus: "error",
+        alertColor: "yellow",
+        alertInterpretation: {
+          title: "FHIR stream warning",
+          rhythm: "The dashboard could not receive the latest FHIR stream frame.",
+          ppg: "Local waveform simulation is still running.",
+          likelyEtiology: "Check whether FastAPI is running on http://127.0.0.1:8000."
+        }
+      }));
+    }
+  });
+
+  return disconnect;
+}, [patient?.fhirId, patient?.id]);
 
   const currentPatient = useMemo(() => {
     if (!patient) return BASE_PATIENT;
@@ -684,13 +705,27 @@ export default function ClinicalPhysiologyPage({ patient, onOpenLabs }) {
     };
   }, [patient]);
 
-const labCards = useMemo(
-  () => [
+const streamDate = formatStreamDate(live.streamTimestamp);
+
+const labCards = useMemo(() => {
+  if (live.priorityTrends?.length) {
+    return live.priorityTrends.map((item) => ({
+      name: item.label,
+      value: item.displayValue ?? item.value,
+      status: statusFromColor(normalizeColor(item.color, "blue")),
+      meta: item.meta || streamDate,
+      trend: item.trend || [],
+      color: normalizeColor(item.color, "blue"),
+      reason: item.reason
+    }));
+  }
+
+  return [
     {
       name: "Glucose",
       value: live.glucose,
       status: statusFromColor(getLiveColor(live, "glucose", "red")),
-      meta: "06/23 07/18",
+      meta: streamDate,
       trend: live.glucoseTrend,
       color: getLiveColor(live, "glucose", "red")
     },
@@ -698,7 +733,7 @@ const labCards = useMemo(
       name: "Potassium",
       value: Number(live.potassium).toFixed(1),
       status: statusFromColor(getLiveColor(live, "potassium", "red")),
-      meta: "06/23 07/18",
+      meta: streamDate,
       trend: live.potassiumTrend,
       color: getLiveColor(live, "potassium", "red")
     },
@@ -706,7 +741,7 @@ const labCards = useMemo(
       name: "Creatinine",
       value: Number(live.creatinine).toFixed(2),
       status: statusFromColor(getLiveColor(live, "creatinine", "red")),
-      meta: "06/23 07/18",
+      meta: streamDate,
       trend: live.creatinineTrend,
       color: getLiveColor(live, "creatinine", "red")
     },
@@ -714,24 +749,24 @@ const labCards = useMemo(
       name: "WBC",
       value: Number(live.wbc).toFixed(1),
       status: statusFromColor(getLiveColor(live, "wbc", "red")),
-      meta: "06/23 07/18",
+      meta: streamDate,
       trend: live.wbcTrend,
       color: getLiveColor(live, "wbc", "red")
     }
-  ],
-  [
-    live.glucose,
-    live.potassium,
-    live.creatinine,
-    live.wbc,
-    live.glucoseTrend,
-    live.potassiumTrend,
-    live.creatinineTrend,
-    live.wbcTrend,
-    live.colors
-  ]
-);
-const streamDate = formatStreamDate(live.streamTimestamp);
+  ];
+}, [
+  live.priorityTrends,
+  live.glucose,
+  live.potassium,
+  live.creatinine,
+  live.wbc,
+  live.glucoseTrend,
+  live.potassiumTrend,
+  live.creatinineTrend,
+  live.wbcTrend,
+  live.colors,
+  streamDate
+]);
 
 const vitalRows = [
   ["BP", `${live.systolic}/${live.diastolic}`, "mmHg", streamDate],
@@ -1109,7 +1144,7 @@ const alertColor = normalizeColor(live.alertColor, "red");
             </thead>
 
             <tbody>
-              {MEDICATION_ROWS.map((row) => (
+              {(live.medicationRows?.length ? live.medicationRows : MEDICATION_ROWS).map((row) => (
                 <tr key={row.med}>
                   <td>
                     <strong>{row.med}</strong>
@@ -1156,3 +1191,4 @@ const alertColor = normalizeColor(live.alertColor, "red");
     </section>
   );
 }
+
