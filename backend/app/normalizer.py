@@ -15,7 +15,7 @@ LOINC = {
     "systolic": ["8480-6"],
     "diastolic": ["8462-4"],
     "bloodPressurePanel": ["85354-9"],
-    "glucose": ["2339-0", "15074-8"],
+    "glucose": ["2339-0", "15074-8", "2345-7"],
     "potassium": ["6298-4", "2823-3"],
     "creatinine": ["2160-0", "38483-4"],
     "wbc": ["6690-2", "26464-8"],
@@ -561,41 +561,73 @@ def dosage_text(resource: dict[str, Any]) -> str:
     return "Check dosage"
 
 
+
 def normalize_medications(resources: list[dict[str, Any]]) -> list[dict[str, Any]]:
     meds = []
 
     for index, resource in enumerate(resources):
-        resource_type = resource.get("resourceType", "Medication")
-        name = medication_name(resource)
-        date = (
-            resource.get("authoredOn")
-            or resource.get("effectiveDateTime")
-            or resource.get("whenHandedOver")
-            or resource.get("meta", {}).get("lastUpdated")
-            or "FHIR record"
-        )
+        try:
+            resource_type = resource.get("resourceType", "Medication")
+            name = medication_name(resource)
+            date = (
+                resource.get("authoredOn")
+                or resource.get("effectiveDateTime")
+                or resource.get("whenHandedOver")
+                or resource.get("whenPrepared")
+                or resource.get("whenHandedOver")
+                or resource.get("meta", {}).get("lastUpdated")
+                or "FHIR record"
+            )
 
-        meds.append({
-            "id": resource.get("id") or f"med-{index}",
-            "name": name,
-            "med": name,
-            "sub": resource.get("status") or resource_type,
-            "dose": dosage_text(resource),
-            "frequency": dosage_text(resource),
-            "prescribed": str(date)[:10],
-            "status": resource.get("status") or "available",
-            "sourceResource": resource_type,
-            "taken": [
-                {
-                    "ok": resource.get("status") not in {"stopped", "cancelled", "entered-in-error"},
-                    "time": str(date)[11:16] if len(str(date)) >= 16 else "--",
-                    "source": resource_type,
-                }
-            ],
-            "date": str(date)[:10],
-        })
+            dose = dosage_text(resource)
+
+            meds.append({
+                "id": resource.get("id") or f"med-{index}",
+                "name": name,
+                "med": name,
+                "sub": resource.get("status") or resource_type,
+                "dose": dose,
+                "frequency": dose,
+                "prescribed": str(date)[:10],
+                "status": resource.get("status") or "available",
+                "sourceResource": resource_type,
+                "taken": [
+                    {
+                        "ok": resource.get("status") not in {
+                            "stopped",
+                            "cancelled",
+                            "entered-in-error",
+                        },
+                        "time": str(date)[11:16] if len(str(date)) >= 16 else "--",
+                        "source": resource_type,
+                    }
+                ],
+                "date": str(date)[:10],
+            })
+
+        except Exception as error:
+            meds.append({
+                "id": resource.get("id") or f"med-error-{index}",
+                "name": resource.get("resourceType", "Medication"),
+                "med": resource.get("resourceType", "Medication"),
+                "sub": "FHIR medication parse warning",
+                "dose": "Check dosage",
+                "frequency": "Check dosage",
+                "prescribed": "FHIR record",
+                "status": "parse-warning",
+                "sourceResource": resource.get("resourceType", "Medication"),
+                "taken": [
+                    {
+                        "ok": False,
+                        "time": "--",
+                        "source": f"parse error: {str(error)}",
+                    }
+                ],
+                "date": "FHIR record",
+            })
 
     return meds
+
 
 
 def build_context_alerts(
